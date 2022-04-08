@@ -1,0 +1,30 @@
+# This workflow broadly does 3 tasks-
+# (1) Create/Update Release drafts
+# (2) Auto Label PR's
+
+# The update_release_draft job handles these tasks, on the basis of event which triggered workflow.
+# (1) if push to master by merging PR.
+# (2) if pull request opened, reopended, or synchronized (commit push)
+
+name: Draft and Bump
+
+on:
+  push:
+    branches:
+      - master
+  # pull_request event is required only for autolabeler
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+jobs:
+  update-release-draft:
+    runs-on: ubuntu-latest
+
+    outputs:
+      tag-name: ${{ steps.release-drafter.outputs.tag_name }}
+
+    steps:
+      - id: release-drafter
+        uses: release-drafter/release-drafter@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
