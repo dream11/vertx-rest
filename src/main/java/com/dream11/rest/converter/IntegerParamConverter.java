@@ -1,7 +1,7 @@
 package com.dream11.rest.converter;
 
-import java.lang.annotation.Annotation;
 import javax.ws.rs.ext.ParamConverter;
+import java.lang.annotation.Annotation;
 
 public class IntegerParamConverter extends BaseParamConverter implements ParamConverter<Integer> {
 

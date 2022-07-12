@@ -1,8 +1,8 @@
 package com.dream11.rest;
 
-import com.dream11.rest.exception.GenericExceptionMapper;
-import com.dream11.rest.exception.ValidationExceptionMapper;
-import com.dream11.rest.exception.WebApplicationExceptionMapper;
+import com.dream11.rest.exception.mapper.GenericExceptionMapper;
+import com.dream11.rest.exception.mapper.ValidationExceptionMapper;
+import com.dream11.rest.exception.mapper.WebApplicationExceptionMapper;
 import com.dream11.rest.filter.LoggerFilter;
 import com.dream11.rest.filter.RequestResponseFilter;
 import com.dream11.rest.filter.TimeoutFilter;
@@ -21,15 +21,16 @@ import io.vertx.reactivex.ext.web.Router;
 import io.vertx.reactivex.ext.web.handler.BodyHandler;
 import io.vertx.reactivex.ext.web.handler.ResponseContentTypeHandler;
 import io.vertx.reactivex.ext.web.handler.StaticHandler;
-import java.util.ArrayList;
-import java.util.List;
-import javax.ws.rs.Path;
-import javax.ws.rs.ext.Provider;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.jboss.resteasy.plugins.server.vertx.VertxRequestHandler;
 import org.jboss.resteasy.plugins.server.vertx.VertxResteasyDeployment;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
+
+import javax.ws.rs.Path;
+import javax.ws.rs.ext.Provider;
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 public abstract class AbstractRestVerticle extends AbstractVerticle {
@@ -37,7 +38,7 @@ public abstract class AbstractRestVerticle extends AbstractVerticle {
   private final String packageName;
   private final HttpServerOptions httpServerOptions;
   private HttpServer httpServer;
-  private ClassInjector injector;
+  private final ClassInjector injector;
 
   public AbstractRestVerticle(String packageName, ClassInjector injector) {
     this(packageName, new HttpServerOptions(), injector);
@@ -111,7 +112,7 @@ public abstract class AbstractRestVerticle extends AbstractVerticle {
     super.stop(stopPromise);
   }
 
-  private VertxResteasyDeployment getResteasyDeployment() {
+  protected VertxResteasyDeployment getResteasyDeployment() {
     VertxResteasyDeployment deployment = new VertxResteasyDeployment();
     deployment.start();
     List<Class<?>> routes = RestUtil.annotatedClasses(packageName, Path.class);
@@ -126,7 +127,7 @@ public abstract class AbstractRestVerticle extends AbstractVerticle {
     return deployment;
   }
 
-  private List<Class<?>> getProviders() {
+  protected List<Class<?>> getProviders() {
     List<Class<?>> providers = new ArrayList<>();
     providers.add(TimeoutFilter.class);
     providers.add(ValidationExceptionMapper.class);

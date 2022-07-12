@@ -5,8 +5,6 @@ import com.dream11.rest.app.Setup;
 import com.dream11.rest.app.inject.AppContext;
 import com.dream11.rest.app.module.MainModule;
 import com.dream11.rest.app.verticle.RestVerticle;
-import io.d11.aerospike.client.AerospikeConnectOptions;
-import io.d11.reactivex.aerospike.client.AerospikeClient;
 import io.reactivex.plugins.RxJavaPlugins;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
@@ -27,7 +25,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.regex.Matcher;
 
 @ExtendWith({VertxExtension.class, Setup.class})
 @Slf4j

@@ -1,5 +1,6 @@
 package com.dream11.rest.app.routes;
 
+import com.dream11.rest.annotation.Timeout;
 import com.dream11.rest.app.dao.HealthCheckDao;
 import com.dream11.rest.app.dto.HealthCheckResponseDTO;
 import com.dream11.rest.app.util.CompletableFutureUtils;
@@ -19,6 +20,7 @@ import java.util.concurrent.CompletionStage;
 
 @Slf4j
 @Path("/healthcheck")
+@Timeout(value=10000)
 public class HealthCheckRoute {
     @Inject
     HealthCheckDao healthCheckDao;

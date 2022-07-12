@@ -1,11 +1,12 @@
 package com.dream11.rest.provider;
 
 import com.dream11.rest.annotation.TypeValidationError;
-import com.dream11.rest.exception.Error;
+import com.dream11.rest.exception.RestError;
 import com.dream11.rest.exception.RestException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import io.vertx.core.json.jackson.DatabindCodec;
 import lombok.SneakyThrows;
+import org.apache.http.HttpStatus;
 import org.jboss.resteasy.plugins.providers.jackson.ResteasyJackson2Provider;
 
 import javax.ws.rs.Consumes;
@@ -31,7 +32,7 @@ public class JsonProvider extends ResteasyJackson2Provider {
   @SneakyThrows
   @Override
   public Object readFrom(Class<Object> type, Type genericType, Annotation[] annotations, MediaType mediaType,
-                         MultivaluedMap<String, String> httpHeaders, InputStream entityStream) throws IOException {
+                         MultivaluedMap<String, String> httpHeaders, InputStream entityStream) {
     try {
       return super.readFrom(type, genericType, annotations, mediaType, httpHeaders, entityStream);
     } catch (JsonMappingException e) {
@@ -41,14 +42,14 @@ public class JsonProvider extends ResteasyJackson2Provider {
         if (fieldName != null) {
           TypeValidationError typeValidationError = type.getDeclaredField(fieldName).getAnnotation(TypeValidationError.class);
           if (typeValidationError != null) {
-            throw new RestException(e, Error.of(typeValidationError.code(), typeValidationError.message()),
-                typeValidationError.httpStatusCode());
+            throw new RestException(RestError.of(typeValidationError.code(), typeValidationError.message(),
+                typeValidationError.httpStatusCode()), e);
           }
         }
       }
-      throw new RestException(e, Error.of("INVALID_REQUEST", e.getMessage()));
+      throw new RestException(RestError.of("INVALID_REQUEST", e.getMessage(), HttpStatus.SC_BAD_REQUEST), e);
     } catch (IOException e) {
-      throw new RestException(e, Error.of("INVALID_REQUEST", e.getMessage()));
+      throw new RestException(RestError.of("INVALID_REQUEST", e.getMessage(), HttpStatus.SC_BAD_REQUEST), e);
     }
   }
 }
