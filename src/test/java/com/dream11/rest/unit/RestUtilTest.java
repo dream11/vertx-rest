@@ -4,7 +4,6 @@ import com.dream11.rest.RestUtil;
 import com.dream11.rest.app.Constants;
 import com.dream11.rest.app.routes.HealthCheckRoute;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;

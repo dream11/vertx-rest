@@ -1,14 +1,21 @@
 # vertx-rest
 
-- [Installation](#installation)
-- [How to use](#how-to-use)
+- [Overview](#overview)
+- [How to use](#usage)
   - [Rest Verticle](#create-rest-verticle)
+    - [Injection](#injection)
   - [JAX-RS Routes](#create-a-rest-resource)
     - [Validations](#validations)
+    - [Exception Handling](#exception-handling)
     - [Swagger](#create-swagger-specificationui)
     - [Timeouts](#timeouts)
+    - [Example Usage](#example-usage)
 - [References](#references)
 
+## Overview
+The vert-rest library aims to make it simple to create a REST application using vertx. A number of Request and Response Filters, Exception Mappers and features like back-pressure, validations, timeout, logging are provided.
+
+It internally uses [resteasy-vertx](https://github.com/resteasy/resteasy/tree/main/server-adapters/resteasy-vertx)
 ## Usage
 
 Add the following dependency to the *dependencies* section of your build descriptor:
@@ -30,8 +37,12 @@ Add the following dependency to the *dependencies* section of your build descrip
 ```
 
 ### Create Rest Verticle:
-
-Create Application REST Verticle by extending `com.dream11.rest.AbstractRestVerticle` class.
+The REST application is deployed as a verticle.
+Create the Application REST Verticle by extending `com.dream11.rest.AbstractRestVerticle` class.
+The `AbstractRestVerticle` here does the following:
+* Finds all the resources(i.e, classes annotated with `@Path`) and adds an instance of each of the resource classes to the resteasy-deployment registry.
+* Adds all the Filters and ExceptionMappers and any other custom Providers(Middle-wares) to the resteasy-deployment.
+* Starts an http-server and dispatches each request to the handler registered with the resteasy-deployment.
 
 example:
 
@@ -72,6 +83,10 @@ public class RestVerticle extends AbstractRestVerticle {
     }
 }
 ```
+#### Injection
+
+Note that the constructor of  `AbstractRestVerticle` requires an Implementation of the `ClassInjector` interface. This will be used for injecting instances of the REST resource classes, and any other types which may need to be injected.
+Refer to `com.dream11.rest.app.inject.AppContext` inside `src/main/test/java`  for an example.
 
 ### Create a Rest Resource
 
@@ -113,7 +128,9 @@ public class HealthCheckRoute {
     }
 }
 ```
-The `@ApiResponse` is only required for creating swagger specification file.
+Note: 
+* The return type of the resource method(`healthcheck()` in the above example) should ideally be a Java class based on the expected response schema. In case of exceptions, CompletionStage<Throwable> can be returned directly. If the exception needs to be handled, handle it using the ExceptionMapper described in the section Exception Handling.
+* The `@ApiResponse` is only required for creating swagger specification file.
 (Refer [this](https://github.com/swagger-api/swagger-core/wiki/Annotations) for more annotations)
 
 #### Validations
@@ -124,122 +141,25 @@ The `@ApiResponse` is only required for creating swagger specification file.
 * `@TypeValidationError` can also be used for `Integer`, `Long`, `Float` or `Double` types in `@HeaderParam`, `@QueryParam` etc. If you
   want to use `@TypeValidationError` on a parameter of type other than these types you can create a custom converter similar to `IntegerParamConverter` and a provider extending `ParamConverterProvider`. [Reference](https://blog.sebastian-daschner.com/entries/jaxrs-convert-params)
 
+#### Exception Handling
+Each exception of a class, let's say `ExampleException`, can be handled(or default handling can be over-ridden ) by implementing an `ExceptionMapper<ExampleException>` and annotating it with `@Provider`. If an ExceptionMapper is not implemented for a class of exceptions, The `GenericExceptionMapper` will be used.  
+(Refer to the package `com.dream11.rest.exception.mapper` for mappers provided by default)
 
-#### Create Swagger Specification/UI
-* Add all swagger-ui resource files present [here](https://github.com/swagger-api/swagger-ui/tree/master/dist), inside `${project.basedir}/src/main/resources/webroot/swagger`. One way to do this is by adding the following plugins in your `pom.xml`.
-```xml
-<plugins>
-  <plugin>
-    <groupId>com.googlecode.maven-download-plugin</groupId>
-    <artifactId>download-maven-plugin</artifactId>
-    <version>1.6.8</version>
-    <executions>
-      <execution>
-        <id>swagger-ui-download</id>
-        <goals>
-          <goal>wget</goal>
-        </goals>
-        <phase>generate-resources</phase>
-        <configuration>
-          <url>https://github.com/swagger-api/swagger-ui/archive/master.zip</url>
-          <unpack>false</unpack>
-          <outputDirectory>${project.build.directory}/swagger</outputDirectory>
-        </configuration>
-      </execution>
-    </executions>
-  </plugin>
+Note:
+* The REST resource method doesn't need to handle exceptions. ExceptionMappers should be used instead. The reason behind this is that if the resource method handles the exception and returns a response object containing an error message, but not the exception itself, the http status code will be that of an OK response(200 by default). 
 
-  <plugin>
-    <groupId>org.codehaus.mojo</groupId>
-    <artifactId>truezip-maven-plugin</artifactId>
-    <version>1.2</version>
-    <executions>
-      <execution>
-        <id>copy dist</id>
-        <goals>
-          <goal>copy</goal>
-        </goals>
-        <phase>generate-resources</phase>
-        <configuration>
-          <fileset>
-            <directory>${project.build.directory}/swagger/master.zip/swagger-ui-master/dist</directory>
-            <outputDirectory>${project.basedir}/${resource.directory}/webroot/swagger</outputDirectory>
-          </fileset>
-        </configuration>
-      </execution>
-    </executions>
-  </plugin>
-</plugins>
-```
-Note: This will leave a zip file containing the swagger-ui resource files at `${project.build.directory}/swagger`. You may remove it using `maven-clean-plugin` and setting the value of phase to one which happens after `generate-resources`
-
-* Add to `.gitignore`
-```gitignore
-  **/webroot/swagger/
-```
-
-* Create `src/main/resources/config/swagger/swagger-info.json` and put basic information about the service. Sample file
-```json
-{
-  "prettyPrint": true,
-  "openAPI": {
-    "info": {
-      "version": "1.0",
-      "title": "some app",
-      "description": "some rest application"
-    }
-  }
-}
-```
-
-* Add to `pom.xml`
-```xml
-  <properties>
-    <maven.swagger.plugin.version>2.2.0</maven.swagger.plugin.version>
-    <maven.dependency.plugin.version>3.1.2</maven.dependency.plugin.version>
-    <swagger.outputFileName>swagger</swagger.outputFileName>
-    <swagger.configurationFilePath>${project.basedir}/src/main/resources/config/swagger/swagger-info.json</swagger.configurationFilePath>
-    <swagger.outputPath>target/classes/webroot/swagger</swagger.outputPath>
-    <swagger.resourcePackage>${project.groupId}.${project.artifactId}.rest</swagger.resourcePackage>
-    <resource.directory>src/main/resources</resource.directory>
-  </properties>
-
-  <plugin>
-    <groupId>io.swagger.core.v3</groupId>
-    <artifactId>swagger-maven-plugin</artifactId>
-    <version>${maven.swagger.plugin.version}</version>
-    <configuration>
-      <outputFileName>${swagger.outputFileName}</outputFileName>
-      <configurationFilePath>${swagger.configurationFilePath}</configurationFilePath>
-      <outputPath>${swagger.outputPath}</outputPath>
-      <outputFormat>JSONANDYAML</outputFormat>
-      <resourcePackages>
-        <package>${swagger.resourcePackage}</package>
-      </resourcePackages>
-      <prettyPrint>true</prettyPrint>
-    </configuration>
-    <executions>
-      <execution>
-      <id>generate-swagger-docs</id>
-      <phase>compile</phase>
-      <goals>
-        <goal>resolve</goal>
-      </goals>
-    </execution>
-    </executions>
-  </plugin>
-```
-Note: ${swagger.resourcePackage} should be the package which contains the rest API classes annotated with `@Path`
-
-* Run `mvn compile` to copy swagger resources and create swagger specification file inside `target/classes/webroot/swagger`
-
-* Start the application and go to `<hostname>:<port>/swagger` to view swagger UI
+#### Swagger Specification
+Follow [this](docs/swagger/swagger-generation.md) doc to generate swagger specification.
 
 #### Timeouts
 
 * Default timeout for each JAX-RS route is `20` seconds
 * You can change the timeout of a particular JAX-RS resource by `@Timeout(<timeoutMillis>)` annotation on class or method
 * Note: 503 status code is returned in case of timeouts
+
+#### Example Usage
+
+Please refer to the package `com.dream11.rest.app` inside `src/main/test/java` for an example Application with a simple `/healthcheck` API
 
 ## References
 

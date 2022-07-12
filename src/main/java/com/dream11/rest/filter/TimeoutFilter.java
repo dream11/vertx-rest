@@ -1,19 +1,15 @@
 package com.dream11.rest.filter;
 
 import com.dream11.rest.annotation.Timeout;
-import com.dream11.rest.exception.Error;
+import com.dream11.rest.exception.RestError;
 import com.dream11.rest.exception.RestException;
 import io.vertx.reactivex.core.Vertx;
-import javax.ws.rs.container.AsyncResponse;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.container.ContainerResponseContext;
-import javax.ws.rs.container.ContainerResponseFilter;
-import javax.ws.rs.container.ResourceInfo;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.ext.Provider;
 import lombok.extern.slf4j.Slf4j;
 import org.jboss.resteasy.core.interception.jaxrs.PostMatchContainerRequestContext;
+
+import javax.ws.rs.container.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.ext.Provider;
 
 @Slf4j
 @Provider
@@ -56,8 +52,8 @@ public class TimeoutFilter implements ContainerRequestFilter, ContainerResponseF
 
     // not using asyncResponse.setTimeout(timeout) because it creates a vertx timer but do not cancel it upon request completion
     if (timeout > 0 && !asyncResponse.isCancelled() && !asyncResponse.isDone()) {
-      long timerId = vertx.setTimer(timeout, id -> asyncResponse.resume(new RestException("Request Timeout",
-          Error.of("REQUEST_TIMEOUT", String.format("Request timed out after %dms", timeout)), 503)));
+      long timerId = vertx.setTimer(timeout, id -> asyncResponse.resume(new RestException(
+              RestError.of("REQUEST_TIMEOUT", String.format("Request timed out after %dms", timeout), 503))));
       containerRequestContext.setProperty(TIMER_ID, timerId);
     }
   }

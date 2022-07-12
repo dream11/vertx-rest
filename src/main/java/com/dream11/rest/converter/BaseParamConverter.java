@@ -1,20 +1,19 @@
 package com.dream11.rest.converter;
 
 import com.dream11.rest.annotation.TypeValidationError;
-import com.dream11.rest.exception.Error;
+import com.dream11.rest.exception.RestError;
 import com.dream11.rest.exception.RestException;
+import lombok.Getter;
+
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Function;
-import lombok.Getter;
 
 public class BaseParamConverter {
 
   @Getter
-  private Error error;
-  @Getter
-  private int httpStatusCode;
+  private RestError error;
 
   public BaseParamConverter(Annotation[] annotations) {
     Optional<TypeValidationError> optionalAnnotation =
@@ -23,8 +22,7 @@ public class BaseParamConverter {
             .map(TypeValidationError.class::cast)
             .findAny();
     optionalAnnotation.ifPresent(typeValidationError -> {
-      this.error = Error.of(typeValidationError.code(), typeValidationError.message());
-      this.httpStatusCode = typeValidationError.httpStatusCode();
+      this.error = RestError.of(typeValidationError.code(), typeValidationError.message(), typeValidationError.httpStatusCode());
     });
   }
 
@@ -33,7 +31,7 @@ public class BaseParamConverter {
       return parseMethod.apply(s);
     } catch (Exception e) {
       if (this.getError() != null) {
-        throw new RestException(e, this.getError(), this.getHttpStatusCode());
+        throw new RestException(this.getError(), e);
       } else {
         throw e;
       }

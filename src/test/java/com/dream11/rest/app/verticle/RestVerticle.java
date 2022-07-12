@@ -6,7 +6,6 @@ import com.dream11.rest.app.inject.AppContext;
 import io.d11.aerospike.client.AerospikeConnectOptions;
 import io.d11.reactivex.aerospike.client.AerospikeClient;
 import io.reactivex.Completable;
-import lombok.SneakyThrows;
 import lombok.experimental.NonFinal;
 
 public class RestVerticle extends AbstractRestVerticle {
