@@ -1,21 +1,22 @@
 package com.dream11.rest.converter;
 
-import javax.ws.rs.ext.ParamConverter;
+import jakarta.ws.rs.ext.ParamConverter;
+
 import java.lang.annotation.Annotation;
 
 public class DoubleParamConverter extends BaseParamConverter implements ParamConverter<Double> {
 
-  public DoubleParamConverter(Annotation[] annotations) {
-    super(annotations);
-  }
+    public DoubleParamConverter(Annotation[] annotations) {
+        super(annotations);
+    }
 
-  @Override
-  public Double fromString(String s) {
-    return this.parseParam(s, Double::parseDouble);
-  }
+    @Override
+    public Double fromString(String s) {
+        return this.parseParam(s, Double::parseDouble);
+    }
 
-  @Override
-  public String toString(Double d) {
-    return d.toString();
-  }
+    @Override
+    public String toString(Double d) {
+        return d.toString();
+    }
 }

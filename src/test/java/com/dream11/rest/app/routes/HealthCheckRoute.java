@@ -9,18 +9,18 @@ import com.google.inject.Inject;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
 import java.util.concurrent.CompletionStage;
 
 @Slf4j
 @Path("/healthcheck")
-@Timeout(value=10000)
+@Timeout(value = 10000)
 public class HealthCheckRoute {
     @Inject
     HealthCheckDao healthCheckDao;
@@ -31,7 +31,7 @@ public class HealthCheckRoute {
     @ApiResponse(content = @Content(schema = @Schema(implementation = HealthCheckResponseDTO.class)))
     public CompletionStage<HealthCheckResponseDTO> healthcheck() {
         return HealthCheckResponseDTO.asyncResponseDtoFromMap(ImmutableMap.of(
-                    "aerospike", healthCheckDao.aerospikeHealthCheck()
+                        "aerospike", healthCheckDao.aerospikeHealthCheck()
                 ))
                 .to(CompletableFutureUtils::fromSingle);
     }
