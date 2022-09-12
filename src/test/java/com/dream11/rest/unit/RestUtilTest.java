@@ -5,11 +5,11 @@ import com.dream11.rest.app.Constants;
 import com.dream11.rest.app.routes.HealthCheckRoute;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.vertx.core.json.JsonObject;
+import jakarta.ws.rs.Path;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
-import javax.ws.rs.Path;
 import java.util.List;
 
 public class RestUtilTest {

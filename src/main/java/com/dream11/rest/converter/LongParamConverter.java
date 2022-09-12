@@ -1,21 +1,23 @@
 package com.dream11.rest.converter;
 
-import javax.ws.rs.ext.ParamConverter;
+
+import jakarta.ws.rs.ext.ParamConverter;
+
 import java.lang.annotation.Annotation;
 
 public class LongParamConverter extends BaseParamConverter implements ParamConverter<Long> {
 
-  public LongParamConverter(Annotation[] annotations) {
-    super(annotations);
-  }
+    public LongParamConverter(Annotation[] annotations) {
+        super(annotations);
+    }
 
-  @Override
-  public Long fromString(String s) {
-    return this.parseParam(s, Long::parseLong);
-  }
+    @Override
+    public Long fromString(String s) {
+        return this.parseParam(s, Long::parseLong);
+    }
 
-  @Override
-  public String toString(Long l) {
-    return l.toString();
-  }
+    @Override
+    public String toString(Long l) {
+        return l.toString();
+    }
 }
