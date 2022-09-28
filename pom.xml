@@ -35,7 +35,7 @@
     <resteasy.version>6.1.0.Final</resteasy.version>
     <hibernate-validator.version>6.1.6.Final</hibernate-validator.version>
     <jakarta.el.version>3.0.3</jakarta.el.version>
-    <swagger-jaxrs2.version>2.1.7</swagger-jaxrs2.version>
+    <swagger-jaxrs2-jakarta.version>2.2.2</swagger-jaxrs2-jakarta.version>
     <reflections.version>0.9.11</reflections.version>
     <guice.version>4.2.2</guice.version>
     <slf4j.version>1.8.0-beta2</slf4j.version>
@@ -57,7 +57,7 @@
     <maven.nexus.plugin.version>1.6.7</maven.nexus.plugin.version>
     <maven.release.plugin.version>3.0.0-M1</maven.release.plugin.version>
 
-    <maven.swagger.plugin.version>2.1.7</maven.swagger.plugin.version>
+    <maven.swagger.plugin.jakarta.version>2.2.2</maven.swagger.plugin.jakarta.version>
     <maven.dependency.plugin.version>3.1.2</maven.dependency.plugin.version>
     <swagger.outputFileName>swagger</swagger.outputFileName>
     <swagger.configurationFilePath>${project.basedir}/src/test/resources/config/swagger/swagger-info.json</swagger.configurationFilePath>
@@ -188,8 +188,8 @@
     <!--    Swagger   -->
     <dependency>
       <groupId>io.swagger.core.v3</groupId>
-      <artifactId>swagger-jaxrs2</artifactId>
-      <version>${swagger-jaxrs2.version}</version>
+      <artifactId>swagger-jaxrs2-jakarta</artifactId>
+      <version>${swagger-jaxrs2-jakarta.version}</version>
     </dependency>
 
     <!--   Tests   -->
@@ -398,8 +398,8 @@
 
       <plugin>
         <groupId>io.swagger.core.v3</groupId>
-        <artifactId>swagger-maven-plugin</artifactId>
-        <version>${maven.swagger.plugin.version}</version>
+        <artifactId>swagger-maven-plugin-jakarta</artifactId>
+        <version>${maven.swagger.plugin.jakarta.version}</version>
         <configuration>
           <outputFileName>${swagger.outputFileName}</outputFileName>
           <configurationFilePath>${swagger.configurationFilePath}</configurationFilePath>
