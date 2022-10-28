@@ -1,6 +1,7 @@
 package com.dream11.rest.unit;
 
-import com.dream11.rest.RestUtil;
+import com.dream11.rest.app.routes.ValidationCheckRoute;
+import com.dream11.rest.util.RestUtil;
 import com.dream11.rest.app.Constants;
 import com.dream11.rest.app.routes.HealthCheckRoute;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -16,8 +17,8 @@ public class RestUtilTest {
     @Test
     public void testAnnotatedClasses() {
         List<Class<?>> classes = RestUtil.annotatedClasses(Constants.TEST_PACKAGE_NAME, Path.class);
-        MatcherAssert.assertThat(classes.size(), Matchers.equalTo(1));
-        MatcherAssert.assertThat(classes, Matchers.contains(HealthCheckRoute.class));
+        MatcherAssert.assertThat(classes.size(), Matchers.equalTo(2));
+        MatcherAssert.assertThat(classes, Matchers.containsInAnyOrder(ValidationCheckRoute.class, HealthCheckRoute.class));
     }
 
     @Test

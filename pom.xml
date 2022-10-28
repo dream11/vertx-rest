@@ -24,8 +24,8 @@
   </distributionManagement>
 
   <properties>
-    <testcontainers.version>1.15.3</testcontainers.version>
-    <junit-jupiter.version>5.8.0-M1</junit-jupiter.version>
+    <testcontainers.version>1.17.5</testcontainers.version>
+    <junit-jupiter.version>5.9.1</junit-jupiter.version>
     <junit.version>4.13.2</junit.version>
     <hamcrest.version>2.2</hamcrest.version>
     <vertx.version>3.9.2</vertx.version>
@@ -33,8 +33,8 @@
     <commons-validator.version>1.6</commons-validator.version>
     <!-- TODO upgrade to latest versions after resteasy start supporting jakarta validations   -->
     <resteasy.version>6.1.0.Final</resteasy.version>
-    <hibernate-validator.version>6.1.6.Final</hibernate-validator.version>
-    <jakarta.el.version>3.0.3</jakarta.el.version>
+    <hibernate-validator.version>8.0.0.Final</hibernate-validator.version>
+    <jakarta.el.version>4.0.0</jakarta.el.version>
     <swagger-jaxrs2-jakarta.version>2.2.2</swagger-jaxrs2-jakarta.version>
     <reflections.version>0.9.11</reflections.version>
     <guice.version>4.2.2</guice.version>
@@ -64,9 +64,6 @@
     <swagger.outputPath>target/classes/webroot/swagger</swagger.outputPath>
     <swagger.resourcePackage>com.dream11.rest.app</swagger.resourcePackage>
     <resource.directory>src/test/resources</resource.directory>
-
-    <!--    Meta data   -->
-    <lastSupported.version>5.0.1</lastSupported.version>
   </properties>
 
   <dependencies>
@@ -105,11 +102,10 @@
     </dependency>
 
     <dependency>
-      <groupId>io.vertx</groupId>
-      <artifactId>vertx-junit5</artifactId>
-      <scope>test</scope>
+      <groupId>me.escoffier.vertx</groupId>
+      <artifactId>vertx-completable-future</artifactId>
+      <version>${vertx-completable-future.version}</version>
     </dependency>
-
     <!--  Logging  -->
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -194,6 +190,12 @@
 
     <!--   Tests   -->
     <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-junit5</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter</artifactId>
       <version>${junit-jupiter.version}</version>
@@ -225,6 +227,7 @@
       <groupId>org.hamcrest</groupId>
       <artifactId>hamcrest</artifactId>
       <version>${hamcrest.version}</version>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
@@ -235,16 +238,14 @@
     </dependency>
 
     <dependency>
-      <groupId>me.escoffier.vertx</groupId>
-      <artifactId>vertx-completable-future</artifactId>
-      <version>${vertx-completable-future.version}</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
       <groupId>io.d11</groupId>
       <artifactId>vertx-aerospike-client</artifactId>
       <version>2.0.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-web-client</artifactId>
     </dependency>
 
   </dependencies>

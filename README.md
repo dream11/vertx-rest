@@ -10,7 +10,7 @@
   - [JAX-RS Routes](#create-a-rest-resource)
     - [Validations](#validations)
     - [Exception Handling](#exception-handling)
-    - [Swagger](#create-swagger-specificationui)
+    - [Swagger](#swagger-specification)
     - [Timeouts](#timeouts)
     - [Example Usage](#example-usage)
 - [References](#references)
@@ -28,16 +28,18 @@ Add the following dependency to the *dependencies* section of your build descrip
   <dependency>
     <groupId>com.dream11</groupId>
     <artifactId>vertx-rest</artifactId>
-    <version>LATEST</version>
+    <version>x.y.z</version>
   </dependency>
 ```
 
 - Gradle (in your `build.gradle` file):
 ```
   dependencies {
-   compile 'com.dream11:vertx-aerospike-client:LATEST'
+   compile 'com.dream11:vertx-aerospike-client:x.y.z'
   }
 ```
+
+Note: Replace `x.y.z` above with one of the [released versions](https://github.com/dream11/vertx-rest/releases)
 
 ### Create Rest Verticle:
 The REST application is deployed as a verticle.
@@ -47,7 +49,7 @@ The `AbstractRestVerticle` here does the following:
 * Adds all the Filters and ExceptionMappers and any other custom Providers(Middle-wares) to the resteasy-deployment.
 * Starts an http-server and dispatches each request to the handler registered with the resteasy-deployment.
 
-example:
+Example:
 
 ```java   
 package com.dream11.rest.app.verticle;
@@ -89,16 +91,17 @@ public class RestVerticle extends AbstractRestVerticle {
 #### Injection
 
 Note that the constructor of  `AbstractRestVerticle` requires an Implementation of the `ClassInjector` interface. This will be used for injecting instances of the REST resource classes, and any other types which may need to be injected.
-Refer to `com.dream11.rest.app.inject.AppContext` inside `src/main/test/java`  for an example.
+Refer to [`com.dream11.rest.app.inject.AppContext`](src/test/java/com/dream11/rest/app/inject/AppContext.java) for an example.
 
 ### Create a Rest Resource
 
 ```java
 package com.dream11.rest.app.routes;
 
+import com.dream11.rest.annotation.Timeout;
 import com.dream11.rest.app.dao.HealthCheckDao;
 import com.dream11.rest.app.dto.HealthCheckResponseDTO;
-import com.dream11.rest.app.util.CompletableFutureUtils;
+import com.dream11.rest.util.CompletableFutureUtils;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -115,30 +118,31 @@ import java.util.concurrent.CompletionStage;
 
 @Slf4j
 @Path("/healthcheck")
+@Timeout(value = 20000, httpStatusCode = 500)
 public class HealthCheckRoute {
-    @Inject
-    HealthCheckDao healthCheckDao;
-  
-    @GET
-    @Consumes(MediaType.WILDCARD)
-    @Produces(MediaType.APPLICATION_JSON)
-    @ApiResponse(content = @Content(schema = @Schema(implementation = HealthCheckResponseDTO.class)))
-    public CompletionStage<HealthCheckResponseDTO> healthcheck() {
-        return HealthCheckResponseDTO.asyncResponseDtoFromMap(ImmutableMap.of(
-                      "aerospike", healthCheckDao.aerospikeHealthCheck()
-                ))
-                .to(CompletableFutureUtils::fromSingle);
-    }
+  @Inject
+  HealthCheckDao healthCheckDao;
+
+  @GET
+  @Consumes(MediaType.WILDCARD)
+  @Produces(MediaType.APPLICATION_JSON)
+  @ApiResponse(content = @Content(schema = @Schema(implementation = HealthCheckResponseDTO.class)))
+  public CompletionStage<HealthCheckResponseDTO> healthcheck() {
+    return HealthCheckResponseDTO.asyncResponseDtoFromMap(ImmutableMap.of(
+                    "aerospike", healthCheckDao.aerospikeHealthCheck()
+            ))
+            .to(CompletableFutureUtils::fromSingle);
+  }
 }
 ```
 Note: 
-* The return type of the resource method(`healthcheck()` in the above example) should ideally be a Java class based on the expected response schema. In case of exceptions, CompletionStage<Throwable> can be returned directly. If the exception needs to be handled, handle it using the ExceptionMapper described in the section Exception Handling.
+* The return type of the resource method(`healthcheck()` in the above example) should ideally be a Java class based on the expected response schema. In case of exceptions, `CompletionStage<Throwable>` can be returned directly. If the exception needs to be handled, handle it using the ExceptionMapper described in the section [Exception Handling](#exception-handling).
 * The `@ApiResponse` is only required for creating swagger specification file.
 (Refer [this](https://github.com/swagger-api/swagger-core/wiki/Annotations) for more annotations)
 
 #### Validations
 
-* Use all the constraints given [here](https://javaee.github.io/javaee-spec/javadocs/javax/validation/constraints/package-summary.html)
+* Use all the constraints given [here](https://jakarta.ee/specifications/bean-validation/3.0/apidocs/jakarta/validation/constraints/package-summary.html)
 * You can use `@TypeValidationError(code=<errorCode>, message=<errorMessage>)` on DTO parameters to send custom error code and message
   when parsing of parameter fails.
 * `@TypeValidationError` can also be used for `Integer`, `Long`, `Float` or `Double` types in `@HeaderParam`, `@QueryParam` etc. If you
@@ -146,7 +150,7 @@ Note:
 
 #### Exception Handling
 Each exception of a class, let's say `ExampleException`, can be handled(or default handling can be over-ridden ) by implementing an `ExceptionMapper<ExampleException>` and annotating it with `@Provider`. If an ExceptionMapper is not implemented for a class of exceptions, The `GenericExceptionMapper` will be used.  
-(Refer to the package `com.dream11.rest.exception.mapper` for mappers provided by default)
+(Refer to the package [`com.dream11.rest.exception.mapper`](src/main/java/com/dream11/rest/exception/mapper) for mappers provided by default)
 
 Note:
 * The REST resource method doesn't need to handle exceptions. ExceptionMappers should be used instead. The reason behind this is that if the resource method handles the exception and returns a response object containing an error message, but not the exception itself, the http status code will be that of an OK response(200 by default). 
@@ -157,8 +161,8 @@ Follow [this](docs/swagger/swagger-generation.md) doc to generate swagger specif
 #### Timeouts
 
 * Default timeout for each JAX-RS route is `20` seconds
-* You can change the timeout of a particular JAX-RS resource by `@Timeout(<timeoutMillis>)` annotation on class or method
-* Note: 503 status code is returned in case of timeouts
+* You can change the timeout of a particular JAX-RS resource by `@Timeout(value = <timeoutMillis>, httpStatusCode = <httpStausCode>)` annotation on the respective class or method
+* Note: Since there is no official HTTP Status code for origin server timeout, it has been kept configurable. By default, 500 status code is returned in case of timeouts.
 
 #### Example Usage
 
@@ -169,5 +173,6 @@ Please refer to the package `com.dream11.rest.app` inside `src/main/test/java` f
 * [Swagger Maven Plugin](https://github.com/swagger-api/swagger-core/tree/master/modules/swagger-maven-plugin)
 * [Resteasy Vertx](https://docs.jboss.org/resteasy/docs/3.1.0.Final/userguide/html/RESTEasy_Embedded_Container.html)
 * [Hibernate Validations](https://hibernate.org/validator/documentation/getting-started/)
+* [Jakarta Validation Constraints](https://jakarta.ee/specifications/bean-validation/3.0/apidocs/jakarta/validation/constraints/package-summary.html)
 * [JAX-RS](https://docs.oracle.com/javaee/6/tutorial/doc/gilik.html)
          

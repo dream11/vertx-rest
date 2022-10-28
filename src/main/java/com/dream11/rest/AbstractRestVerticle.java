@@ -9,12 +9,12 @@ import com.dream11.rest.filter.TimeoutFilter;
 import com.dream11.rest.provider.JsonProvider;
 import com.dream11.rest.provider.ParamConverterProvider;
 import com.dream11.rest.route.ClassInjector;
+import com.dream11.rest.util.RestUtil;
 import io.reactivex.Completable;
 import io.reactivex.Single;
 import io.vertx.core.Promise;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.reactivex.core.AbstractVerticle;
-import io.vertx.reactivex.core.RxHelper;
 import io.vertx.reactivex.core.http.HttpServer;
 import io.vertx.reactivex.core.http.HttpServerRequest;
 import io.vertx.reactivex.ext.web.Router;
@@ -73,8 +73,6 @@ public abstract class AbstractRestVerticle extends AbstractVerticle {
                     log.error("Dropping request with status 503");
                     req.response().setStatusCode(503).end();
                 })
-                // TODO: Understand why removing this seemingly redundant observeOn increases latency & CPU
-                .observeOn(RxHelper.scheduler(new io.vertx.reactivex.core.Context(this.context)))
                 .doOnNext(req -> {
                     if (req.path().matches("/swagger(.*)")) {
                         router.handle(req);
@@ -88,9 +86,9 @@ public abstract class AbstractRestVerticle extends AbstractVerticle {
 
         return server
                 .rxListen()
-                .doOnSuccess(res -> log.info("Started http server at " + this.httpServerOptions.getPort() + " package : " + packageName))
+                .doOnSuccess(res -> log.info("Started http server at port: {} for package: {}" , this.httpServerOptions.getPort(), packageName))
                 .doOnError(error -> log.error(
-                        "Failed to start http server at port :" + this.httpServerOptions.getPort() + " with error " + error.getMessage()))
+                        "Failed to start http server at port : {} with error: {}", this.httpServerOptions.getPort(), error.getMessage()))
                 .doOnSubscribe(disposable -> handleRequests.subscribe());
     }
 
@@ -118,7 +116,6 @@ public abstract class AbstractRestVerticle extends AbstractVerticle {
         log.info("JAX-RS routes : " + routes.size());
         ResteasyProviderFactory resteasyProviderFactory = deployment.getProviderFactory();
         getProviders().forEach(resteasyProviderFactory::register);
-        resteasyProviderFactory.register(getReqResFilter());
         // not using deployment.getRegistry().addPerInstanceResource because it creates new instance of resource for each request
         routes.forEach(route -> {
             deployment.getRegistry().addSingletonResource(injector.getInstance(route));
@@ -134,6 +131,7 @@ public abstract class AbstractRestVerticle extends AbstractVerticle {
         providers.add(WebApplicationExceptionMapper.class);
         providers.add(JsonProvider.class);
         providers.add(ParamConverterProvider.class);
+        providers.add(getReqResFilter().getClass());
         providers.addAll(RestUtil.annotatedClasses(packageName, Provider.class));
         return providers;
     }

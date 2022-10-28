@@ -1,4 +1,4 @@
-#OpenAPI Specification generation
+# OpenAPI Specification generation
 
 #### How to create Swagger Specification/UI
 * Add all swagger-ui resource files present [here](https://github.com/swagger-api/swagger-ui/tree/master/dist), inside `${project.basedir}/src/main/resources/webroot/swagger`. One way to do this is by adding the following plugins in your `pom.xml`.
@@ -104,7 +104,7 @@ Note: This will leave a zip file containing the swagger-ui resource files at `${
     </executions>
   </plugin>
 ```
-Note: ${swagger.resourcePackage} should be the package which contains the rest API classes annotated with `@Path`
+Note: `${swagger.resourcePackage}` should be the package which contains the rest API classes annotated with `@Path`
 
 * Run `mvn compile` to copy swagger resources and create swagger specification file inside `target/classes/webroot/swagger`
 

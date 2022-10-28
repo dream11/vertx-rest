@@ -12,4 +12,7 @@ public class Constants {
     public static final String INIT_DATA_PATH_IN_CONTAINER = "/aerospike-seed/init.aql";
     public static final String HEALTHCHECK_RESPONSE = "{\"checks\":[{\"error\":null,\"response\":{\"isConnected\":true},\"status\":\"UP\",\"type\":\"aerospike\"}]}";
     public static final String TEST_PACKAGE_NAME = "com.dream11.rest";
+    public static final String HEALTHCHECK_URI = "http://127.0.0.1:80/healthcheck";
+    public static final String VALIDATION_URI = "http://127.0.0.1:80/validationTest/123";
+    public static final String TEST_QUERY_PARAM_NAME = "testFilter";
 }

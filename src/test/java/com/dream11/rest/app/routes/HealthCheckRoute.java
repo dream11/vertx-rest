@@ -3,7 +3,7 @@ package com.dream11.rest.app.routes;
 import com.dream11.rest.annotation.Timeout;
 import com.dream11.rest.app.dao.HealthCheckDao;
 import com.dream11.rest.app.dto.HealthCheckResponseDTO;
-import com.dream11.rest.app.util.CompletableFutureUtils;
+import com.dream11.rest.util.CompletableFutureUtils;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import io.swagger.v3.oas.annotations.media.Content;

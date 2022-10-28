@@ -8,6 +8,7 @@ import jakarta.ws.rs.container.*;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.ext.Provider;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.HttpStatus;
 import org.jboss.resteasy.core.interception.jaxrs.PostMatchContainerRequestContext;
 
 
@@ -16,6 +17,8 @@ import org.jboss.resteasy.core.interception.jaxrs.PostMatchContainerRequestConte
 public class TimeoutFilter implements ContainerRequestFilter, ContainerResponseFilter {
 
     private static final String TIMER_ID = "__TIMER_ID__";
+    private static final Long DEFAULT_TIMEOUT = 20000L;
+    private static final int DEFAULT_HTTP_STATUS_CODE = HttpStatus.SC_INTERNAL_SERVER_ERROR;
     private final Vertx vertx = Vertx.currentContext().owner();
     @Context
     private ResourceInfo resourceInfo;
@@ -45,15 +48,18 @@ public class TimeoutFilter implements ContainerRequestFilter, ContainerResponseF
         Timeout resourceClassAnnotation = resourceInfo.getResourceClass().getAnnotation(Timeout.class);
         // check timeout annotation on resource method then check on resource class
         long timeout = resourceMethodAnnotation == null ?
-                resourceClassAnnotation == null ? 20000L : resourceClassAnnotation.value() :
+                resourceClassAnnotation == null ? DEFAULT_TIMEOUT : resourceClassAnnotation.value() :
                 resourceMethodAnnotation.value();
+        int httpStatusCode = resourceMethodAnnotation == null ?
+                resourceClassAnnotation == null ? DEFAULT_HTTP_STATUS_CODE : resourceClassAnnotation.httpStatusCode() :
+                resourceMethodAnnotation.httpStatusCode();
         AsyncResponse asyncResponse =
                 ((PostMatchContainerRequestContext) containerRequestContext).getHttpRequest().getAsyncContext().getAsyncResponse();
 
         // not using asyncResponse.setTimeout(timeout) because it creates a vertx timer but do not cancel it upon request completion
         if (timeout > 0 && !asyncResponse.isCancelled() && !asyncResponse.isDone()) {
             long timerId = vertx.setTimer(timeout, id -> asyncResponse.resume(new RestException(
-                    RestError.of("REQUEST_TIMEOUT", String.format("Request timed out after %dms", timeout), 503))));
+                    RestError.of("REQUEST_TIMEOUT", String.format("Request timed out after %dms", timeout), httpStatusCode))));
             containerRequestContext.setProperty(TIMER_ID, timerId);
         }
     }

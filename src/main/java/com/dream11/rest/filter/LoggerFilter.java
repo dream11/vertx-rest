@@ -1,6 +1,6 @@
 package com.dream11.rest.filter;
 
-import com.dream11.rest.RestUtil;
+import com.dream11.rest.util.RestUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerResponseContext;

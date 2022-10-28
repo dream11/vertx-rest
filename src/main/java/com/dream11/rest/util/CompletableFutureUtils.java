@@ -1,4 +1,4 @@
-package com.dream11.rest.app.util;
+package com.dream11.rest.util;
 
 import io.reactivex.Single;
 import me.escoffier.vertx.completablefuture.VertxCompletableFuture;
