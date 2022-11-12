@@ -33,11 +33,11 @@
     <resteasy.version>6.2.1.Final</resteasy.version>
     <hibernate-validator.version>8.0.0.Final</hibernate-validator.version>
     <jakarta.el.version>4.0.2</jakarta.el.version>
-    <swagger-jaxrs2-jakarta.version>2.2.2</swagger-jaxrs2-jakarta.version>
+    <swagger-jaxrs2-jakarta.version>2.2.6</swagger-jaxrs2-jakarta.version>
     <reflections.version>0.9.11</reflections.version>
     <guice.version>4.2.2</guice.version>
-    <slf4j.version>1.8.0-beta2</slf4j.version>
-    <logback.version>1.3.0-alpha4</logback.version>
+    <slf4j.version>2.0.3</slf4j.version>
+    <logback.version>1.4.4</logback.version>
     <vertx-completable-future.version>0.1.2</vertx-completable-future.version>
 
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -56,7 +56,7 @@
     <maven.nexus.plugin.version>1.6.7</maven.nexus.plugin.version>
     <maven.release.plugin.version>3.0.0-M1</maven.release.plugin.version>
 
-    <maven.swagger.plugin.jakarta.version>2.2.2</maven.swagger.plugin.jakarta.version>
+    <maven.swagger.plugin.jakarta.version>2.2.6</maven.swagger.plugin.jakarta.version>
     <maven.dependency.plugin.version>3.1.2</maven.dependency.plugin.version>
     <swagger.outputFileName>swagger</swagger.outputFileName>
     <swagger.configurationFilePath>${project.basedir}/src/test/resources/config/swagger/swagger-info.json</swagger.configurationFilePath>
@@ -445,6 +445,17 @@
             <package>${swagger.resourcePackage}</package>
           </resourcePackages>
           <prettyPrint>true</prettyPrint>
+          <resourceClasses>
+            <resourceClass>
+              com.dream11.rest.app.routes.HealthCheckRoute
+            </resourceClass>
+            <resourceClass>
+              com.dream11.rest.app.routes.TimeoutRoute
+            </resourceClass>
+            <resourceClass>
+              com.dream11.rest.app.routes.ValidationCheckRoute
+            </resourceClass>
+          </resourceClasses>
         </configuration>
         <executions>
           <execution>
