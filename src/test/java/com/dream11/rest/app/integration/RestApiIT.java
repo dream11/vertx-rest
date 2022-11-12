@@ -11,9 +11,11 @@ import io.vertx.reactivex.core.Vertx;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeAll;
@@ -26,10 +28,10 @@ import java.util.Arrays;
 
 @ExtendWith({VertxExtension.class, Setup.class})
 @Slf4j
-public class RestAppIT {
+public class RestApiIT {
 
-  static HttpClient httpClient;
-  static Vertx vertx = Vertx.vertx();
+  private final CloseableHttpClient httpClient = HttpClients.createDefault();
+  private static final Vertx vertx = Vertx.vertx();
 
   @BeforeAll
   public static void setup() {
@@ -44,7 +46,6 @@ public class RestAppIT {
   @Test
   public void healthCheckTest() throws IOException {
     String uri = String.format("http://127.0.0.1:%s%s", Constants.APPLICATION_PORT, Constants.HEALTHCHECK_ROUTE_PATH);
-    httpClient = HttpClientBuilder.create().build();
     HttpResponse response = httpClient.execute(new HttpGet(uri));
     MatcherAssert.assertThat(response.getStatusLine().getStatusCode(), Matchers.equalTo(200));
     MatcherAssert.assertThat(IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8),
@@ -54,7 +55,6 @@ public class RestAppIT {
   @Test
   public void nullHeaderTest() throws IOException {
     String uri = String.format("http://127.0.0.1:%s%s/1?testFilter=query", Constants.APPLICATION_PORT, Constants.VALIDATION_ROUTE_PATH);
-    httpClient = HttpClientBuilder.create().build();
     HttpResponse response = httpClient.execute(new HttpGet(uri));
     MatcherAssert.assertThat(response.getStatusLine().getStatusCode(), Matchers.equalTo(400));
   }
@@ -62,7 +62,6 @@ public class RestAppIT {
   @Test
   public void nullQueryParamTest() throws IOException {
     String uri = String.format("http://127.0.0.1:%s%s/1", Constants.APPLICATION_PORT, Constants.VALIDATION_ROUTE_PATH);
-    httpClient = HttpClientBuilder.create().build();
     HttpGet request = new HttpGet(uri);
     request.setHeader("testHeader", "1");
     HttpResponse response = httpClient.execute(request);
@@ -72,7 +71,6 @@ public class RestAppIT {
   @Test
   public void timeOutTest() throws IOException {
     String uri = String.format("http://127.0.0.1:%s%s", Constants.APPLICATION_PORT, Constants.TIMEOUT_ROUTE_PATH);
-    httpClient = HttpClientBuilder.create().build();
     HttpResponse response = httpClient.execute(new HttpGet(uri));
     MatcherAssert.assertThat(response.getStatusLine().getStatusCode(), Matchers.equalTo(503));
   }
@@ -81,7 +79,6 @@ public class RestAppIT {
   public void integerTypeValidationParamTest() throws IOException {
     String uri = String.format("http://127.0.0.1:%s%s/1?testFilter=query&integerParam=integer", Constants.APPLICATION_PORT,
         Constants.VALIDATION_ROUTE_PATH);
-    httpClient = HttpClientBuilder.create().build();
     HttpGet request = new HttpGet(uri);
     request.setHeader("testHeader", "1");
     HttpResponse response = httpClient.execute(request);
@@ -97,7 +94,6 @@ public class RestAppIT {
   public void longTypeValidationParamTest() throws IOException {
     String uri = String.format("http://127.0.0.1:%s%s/1?testFilter=query&longParam=long", Constants.APPLICATION_PORT,
         Constants.VALIDATION_ROUTE_PATH);
-    httpClient = HttpClientBuilder.create().build();
     HttpGet request = new HttpGet(uri);
     request.setHeader("testHeader", "1");
     HttpResponse response = httpClient.execute(request);
@@ -113,7 +109,6 @@ public class RestAppIT {
   public void floatTypeValidationParamTest() throws IOException {
     String uri = String.format("http://127.0.0.1:%s%s/1?testFilter=query&floatParam=float", Constants.APPLICATION_PORT,
         Constants.VALIDATION_ROUTE_PATH);
-    httpClient = HttpClientBuilder.create().build();
     HttpGet request = new HttpGet(uri);
     request.setHeader("testHeader", "1");
     HttpResponse response = httpClient.execute(request);
@@ -129,7 +124,6 @@ public class RestAppIT {
   public void doubleTypeValidationParamTest() throws IOException {
     String uri = String.format("http://127.0.0.1:%s%s/1?testFilter=query&doubleParam=double", Constants.APPLICATION_PORT,
         Constants.VALIDATION_ROUTE_PATH);
-    httpClient = HttpClientBuilder.create().build();
     HttpGet request = new HttpGet(uri);
     request.setHeader("testHeader", "1");
     HttpResponse response = httpClient.execute(request);
@@ -139,5 +133,20 @@ public class RestAppIT {
     MatcherAssert.assertThat(responseBody.getJsonObject("error").getString("message"),
         Matchers.equalTo("Query param 'doubleParam' must be double"));
 
+  }
+
+  @Test
+  public void validateBodyTest() throws IOException {
+    String uri = String.format("http://127.0.0.1:%s%s", Constants.APPLICATION_PORT, Constants.VALIDATION_ROUTE_PATH);
+    HttpPost request = new HttpPost(uri);
+    request.setHeader("Content-type", "application/json");
+    JsonObject json = new JsonObject().put("resourceId", "Hello");
+    request.setEntity(new StringEntity(json.toString()));
+    HttpResponse response = httpClient.execute(request);
+    JsonObject responseBody = new JsonObject(IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8));
+    MatcherAssert.assertThat(response.getStatusLine().getStatusCode(), Matchers.equalTo(400));
+    MatcherAssert.assertThat(responseBody.getJsonObject("error").getString("code"), Matchers.equalTo("BAD_REQUEST"));
+    MatcherAssert.assertThat(responseBody.getJsonObject("error").getString("message"),
+        Matchers.equalTo("resourceId must be integer"));
   }
 }

@@ -1,8 +1,7 @@
 package com.dream11.rest.app.dto;
 
-import jakarta.validation.constraints.NotEmpty;
+import com.dream11.rest.annotation.TypeValidationError;
 import jakarta.validation.constraints.NotNull;
-import java.util.List;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,8 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ValidationTestReqDTO {
   @NotNull
+  @TypeValidationError(code = "BAD_REQUEST", message = "resourceId must be integer")
   Integer resourceId;
-
-  @NotEmpty
-  List<Integer> tags;
 }
