@@ -56,14 +56,14 @@ public abstract class AbstractRestVerticle extends AbstractVerticle {
 
     @Override
     public Completable rxStart() {
-        return startHttpServer().doOnSuccess(server -> {
+        return this.startHttpServer().doOnSuccess(server -> {
             this.httpServer = server;
         }).ignoreElement();
     }
 
     private Single<HttpServer> startHttpServer() {
-        VertxResteasyDeployment deployment = getResteasyDeployment();
-        Router router = getRouter();
+        VertxResteasyDeployment deployment = this.getResteasyDeployment();
+        Router router = this.getRouter();
         VertxRequestHandler vertxRequestHandler = new VertxRequestHandler(vertx.getDelegate(), deployment);
         val server = vertx.createHttpServer(this.httpServerOptions);
         val handleRequests = server.requestStream()
@@ -115,7 +115,7 @@ public abstract class AbstractRestVerticle extends AbstractVerticle {
         List<Class<?>> routes = RestUtil.annotatedClasses(packageName, Path.class);
         log.info("JAX-RS routes : " + routes.size());
         ResteasyProviderFactory resteasyProviderFactory = deployment.getProviderFactory();
-        getProviders().forEach(resteasyProviderFactory::register);
+        this.getProviders().forEach(resteasyProviderFactory::register);
         // not using deployment.getRegistry().addPerInstanceResource because it creates new instance of resource for each request
         routes.forEach(route -> {
             deployment.getRegistry().addSingletonResource(injector.getInstance(route));
@@ -131,7 +131,7 @@ public abstract class AbstractRestVerticle extends AbstractVerticle {
         providers.add(WebApplicationExceptionMapper.class);
         providers.add(JsonProvider.class);
         providers.add(ParamConverterProvider.class);
-        providers.add(getReqResFilter().getClass());
+        providers.add(this.getReqResFilter().getClass());
         providers.addAll(RestUtil.annotatedClasses(packageName, Provider.class));
         return providers;
     }

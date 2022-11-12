@@ -24,9 +24,9 @@ public class RestUtilTest {
     @Test
     public void testGetString() throws JsonProcessingException {
         JsonObject healthCheckJson = new JsonObject(Constants.HEALTHCHECK_RESPONSE);
-        MatcherAssert.assertThat(RestUtil.getString(Constants.HEALTHCHECK_RESPONSE), Matchers.equalTo(Constants.HEALTHCHECK_RESPONSE));
-        MatcherAssert.assertThat(RestUtil.getString(healthCheckJson), Matchers.equalTo(Constants.HEALTHCHECK_RESPONSE));
-        MatcherAssert.assertThat(RestUtil.getString(healthCheckJson.getJsonArray("checks").getList()),
+        MatcherAssert.assertThat(RestUtil.objectToString(Constants.HEALTHCHECK_RESPONSE), Matchers.equalTo(Constants.HEALTHCHECK_RESPONSE));
+        MatcherAssert.assertThat(RestUtil.objectToString(healthCheckJson), Matchers.equalTo(Constants.HEALTHCHECK_RESPONSE));
+        MatcherAssert.assertThat(RestUtil.objectToString(healthCheckJson.getJsonArray("checks").getList()),
                 Matchers.equalTo(healthCheckJson.getValue("checks").toString()));
     }
 }

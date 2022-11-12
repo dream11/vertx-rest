@@ -49,7 +49,7 @@ public class RestUtil {
     }
   }
 
-  public static String getString(Object object) throws JsonProcessingException {
+  public static String objectToString(Object object) throws JsonProcessingException {
     ObjectMapper objectMapper = DatabindCodec.mapper();
     String str;
     if (object instanceof String) {

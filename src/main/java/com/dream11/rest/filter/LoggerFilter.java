@@ -19,7 +19,7 @@ public class LoggerFilter extends RequestResponseFilter {
 
     @Override
     protected String getResponseString(Object response) throws JsonProcessingException {
-        return RestUtil.getString(response);
+        return RestUtil.objectToString(response);
     }
 
     @Override
