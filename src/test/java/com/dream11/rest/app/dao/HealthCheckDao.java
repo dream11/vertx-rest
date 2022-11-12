@@ -9,14 +9,14 @@ import io.reactivex.Single;
 import io.vertx.core.json.JsonObject;
 
 public class HealthCheckDao {
-    @Inject
-    AerospikeClient client;
+  @Inject
+  AerospikeClient client;
 
-    public Single<JsonObject> aerospikeHealthCheck() {
-        return client
-                .rxIsConnected()
-                .flatMap(isConnected -> isConnected ?
-                        Single.just(new JsonObject().put("isConnected", true)) :
-                        Single.error(new RestException(RestError.of(RestAppError.AEROSPIKE_NOT_CONNECTED))));
-    }
+  public Single<JsonObject> aerospikeHealthCheck() {
+    return client
+        .rxIsConnected()
+        .flatMap(isConnected -> isConnected ?
+            Single.just(new JsonObject().put("isConnected", true)) :
+            Single.error(new RestException(RestError.of(RestAppError.AEROSPIKE_NOT_CONNECTED))));
+  }
 }

@@ -9,11 +9,11 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class GenericExceptionMapper implements ExceptionMapper<Throwable> {
-    @Override
-    public Response toResponse(Throwable throwable) {
-        RestException restException = (RestException) ExceptionUtil.parseThrowable(throwable);
-        log.error("Error: " + restException.getError().getErrorCode() + " " + restException.getHttpStatusCode()
-                + " " + restException.getError().getErrorMessage(), throwable);
-        return Response.status(restException.getHttpStatusCode()).entity(restException.toString()).build();
-    }
+  @Override
+  public Response toResponse(Throwable throwable) {
+    RestException restException = (RestException) ExceptionUtil.parseThrowable(throwable);
+    log.error("Error: " + restException.getError().getErrorCode() + " " + restException.getHttpStatusCode()
+        + " " + restException.getError().getErrorMessage(), throwable);
+    return Response.status(restException.getHttpStatusCode()).entity(restException.toString()).build();
+  }
 }

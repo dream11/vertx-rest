@@ -3,12 +3,11 @@ package com.dream11.rest.converter;
 import com.dream11.rest.annotation.TypeValidationError;
 import com.dream11.rest.exception.RestError;
 import com.dream11.rest.exception.RestException;
-import lombok.Getter;
-
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Function;
+import lombok.Getter;
 
 public class BaseParamConverter {
 

@@ -23,116 +23,115 @@ import io.vertx.reactivex.ext.web.handler.ResponseContentTypeHandler;
 import io.vertx.reactivex.ext.web.handler.StaticHandler;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.ext.Provider;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.jboss.resteasy.plugins.server.vertx.VertxRequestHandler;
 import org.jboss.resteasy.plugins.server.vertx.VertxResteasyDeployment;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Slf4j
 public abstract class AbstractRestVerticle extends AbstractVerticle {
 
-    private final String packageName;
-    private final HttpServerOptions httpServerOptions;
-    private final ClassInjector injector;
-    private HttpServer httpServer;
+  private final String packageName;
+  private final HttpServerOptions httpServerOptions;
+  private final ClassInjector injector;
+  private HttpServer httpServer;
 
-    public AbstractRestVerticle(String packageName, ClassInjector injector) {
-        this(packageName, new HttpServerOptions(), injector);
+  public AbstractRestVerticle(String packageName, ClassInjector injector) {
+    this(packageName, new HttpServerOptions(), injector);
+  }
+
+  public AbstractRestVerticle(String packageName, HttpServerOptions httpServerOptions, ClassInjector injector) {
+    this.packageName = packageName;
+    this.httpServerOptions = httpServerOptions;
+    this.injector = injector;
+  }
+
+  protected RequestResponseFilter getReqResFilter() {
+    return new LoggerFilter();
+  }
+
+  @Override
+  public Completable rxStart() {
+    return this.startHttpServer().doOnSuccess(server -> {
+      this.httpServer = server;
+    }).ignoreElement();
+  }
+
+  private Single<HttpServer> startHttpServer() {
+    VertxResteasyDeployment deployment = this.getResteasyDeployment();
+    Router router = this.getRouter();
+    VertxRequestHandler vertxRequestHandler = new VertxRequestHandler(vertx.getDelegate(), deployment);
+    val server = vertx.createHttpServer(this.httpServerOptions);
+    val handleRequests = server.requestStream()
+        .toFlowable()
+        .map(HttpServerRequest::pause)
+        .onBackpressureDrop(req -> {
+          log.error("Dropping request with status 503");
+          req.response().setStatusCode(503).end();
+        })
+        .doOnNext(req -> {
+          if (req.path().matches("/swagger(.*)")) {
+            router.handle(req);
+          } else {
+            vertxRequestHandler.handle(req.getDelegate());
+          }
+        })
+        .map(HttpServerRequest::resume)
+        .doOnError(error -> log.error("Uncaught ERROR while handling request", error))
+        .ignoreElements();
+
+    return server
+        .rxListen()
+        .doOnSuccess(res -> log.info("Started http server at port: {} for package: {}", this.httpServerOptions.getPort(), packageName))
+        .doOnError(error -> log.error(
+            "Failed to start http server at port : {} with error: {}", this.httpServerOptions.getPort(), error.getMessage()))
+        .doOnSubscribe(disposable -> handleRequests.subscribe());
+  }
+
+  protected Router getRouter() {
+    Router router = Router.router(vertx);
+    router.route().handler(BodyHandler.create());
+    router.route().handler(ResponseContentTypeHandler.create());
+    router.route().handler(StaticHandler.create());
+    return router;
+  }
+
+  @Override
+  public void stop(Promise<Void> stopPromise) throws Exception {
+    if (this.httpServer != null) {
+      log.info("stopping http server.");
+      this.httpServer.close();
     }
+    super.stop(stopPromise);
+  }
 
-    public AbstractRestVerticle(String packageName, HttpServerOptions httpServerOptions, ClassInjector injector) {
-        this.packageName = packageName;
-        this.httpServerOptions = httpServerOptions;
-        this.injector = injector;
-    }
+  protected VertxResteasyDeployment getResteasyDeployment() {
+    VertxResteasyDeployment deployment = new VertxResteasyDeployment();
+    deployment.start();
+    List<Class<?>> routes = RestUtil.annotatedClasses(packageName, Path.class);
+    log.info("JAX-RS routes : " + routes.size());
+    ResteasyProviderFactory resteasyProviderFactory = deployment.getProviderFactory();
+    this.getProviders().forEach(resteasyProviderFactory::register);
+    // not using deployment.getRegistry().addPerInstanceResource because it creates new instance of resource for each request
+    routes.forEach(route -> {
+      deployment.getRegistry().addSingletonResource(injector.getInstance(route));
+    });
+    return deployment;
+  }
 
-    protected RequestResponseFilter getReqResFilter() {
-        return new LoggerFilter();
-    }
-
-    @Override
-    public Completable rxStart() {
-        return this.startHttpServer().doOnSuccess(server -> {
-            this.httpServer = server;
-        }).ignoreElement();
-    }
-
-    private Single<HttpServer> startHttpServer() {
-        VertxResteasyDeployment deployment = this.getResteasyDeployment();
-        Router router = this.getRouter();
-        VertxRequestHandler vertxRequestHandler = new VertxRequestHandler(vertx.getDelegate(), deployment);
-        val server = vertx.createHttpServer(this.httpServerOptions);
-        val handleRequests = server.requestStream()
-                .toFlowable()
-                .map(HttpServerRequest::pause)
-                .onBackpressureDrop(req -> {
-                    log.error("Dropping request with status 503");
-                    req.response().setStatusCode(503).end();
-                })
-                .doOnNext(req -> {
-                    if (req.path().matches("/swagger(.*)")) {
-                        router.handle(req);
-                    } else {
-                        vertxRequestHandler.handle(req.getDelegate());
-                    }
-                })
-                .map(HttpServerRequest::resume)
-                .doOnError(error -> log.error("Uncaught ERROR while handling request", error))
-                .ignoreElements();
-
-        return server
-                .rxListen()
-                .doOnSuccess(res -> log.info("Started http server at port: {} for package: {}" , this.httpServerOptions.getPort(), packageName))
-                .doOnError(error -> log.error(
-                        "Failed to start http server at port : {} with error: {}", this.httpServerOptions.getPort(), error.getMessage()))
-                .doOnSubscribe(disposable -> handleRequests.subscribe());
-    }
-
-    protected Router getRouter() {
-        Router router = Router.router(vertx);
-        router.route().handler(BodyHandler.create());
-        router.route().handler(ResponseContentTypeHandler.create());
-        router.route().handler(StaticHandler.create());
-        return router;
-    }
-
-    @Override
-    public void stop(Promise<Void> stopPromise) throws Exception {
-        if (this.httpServer != null) {
-            log.info("stopping http server.");
-            this.httpServer.close();
-        }
-        super.stop(stopPromise);
-    }
-
-    protected VertxResteasyDeployment getResteasyDeployment() {
-        VertxResteasyDeployment deployment = new VertxResteasyDeployment();
-        deployment.start();
-        List<Class<?>> routes = RestUtil.annotatedClasses(packageName, Path.class);
-        log.info("JAX-RS routes : " + routes.size());
-        ResteasyProviderFactory resteasyProviderFactory = deployment.getProviderFactory();
-        this.getProviders().forEach(resteasyProviderFactory::register);
-        // not using deployment.getRegistry().addPerInstanceResource because it creates new instance of resource for each request
-        routes.forEach(route -> {
-            deployment.getRegistry().addSingletonResource(injector.getInstance(route));
-        });
-        return deployment;
-    }
-
-    protected List<Class<?>> getProviders() {
-        List<Class<?>> providers = new ArrayList<>();
-        providers.add(TimeoutFilter.class);
-        providers.add(ValidationExceptionMapper.class);
-        providers.add(GenericExceptionMapper.class);
-        providers.add(WebApplicationExceptionMapper.class);
-        providers.add(JsonProvider.class);
-        providers.add(ParamConverterProvider.class);
-        providers.add(this.getReqResFilter().getClass());
-        providers.addAll(RestUtil.annotatedClasses(packageName, Provider.class));
-        return providers;
-    }
+  protected List<Class<?>> getProviders() {
+    List<Class<?>> providers = new ArrayList<>();
+    providers.add(TimeoutFilter.class);
+    providers.add(ValidationExceptionMapper.class);
+    providers.add(GenericExceptionMapper.class);
+    providers.add(WebApplicationExceptionMapper.class);
+    providers.add(JsonProvider.class);
+    providers.add(ParamConverterProvider.class);
+    providers.add(this.getReqResFilter().getClass());
+    providers.addAll(RestUtil.annotatedClasses(packageName, Provider.class));
+    return providers;
+  }
 }

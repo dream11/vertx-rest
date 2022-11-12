@@ -14,25 +14,24 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
-import lombok.extern.slf4j.Slf4j;
-
 import java.util.concurrent.CompletionStage;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Path("/healthcheck")
 @Timeout(value = 10000)
 public class HealthCheckRoute {
-    @Inject
-    HealthCheckDao healthCheckDao;
+  @Inject
+  HealthCheckDao healthCheckDao;
 
-    @GET
-    @Consumes(MediaType.WILDCARD)
-    @Produces(MediaType.APPLICATION_JSON)
-    @ApiResponse(content = @Content(schema = @Schema(implementation = HealthCheckResponseDTO.class)))
-    public CompletionStage<HealthCheckResponseDTO> healthcheck() {
-        return HealthCheckResponseDTO.asyncResponseDtoFromMap(ImmutableMap.of(
-                        "aerospike", healthCheckDao.aerospikeHealthCheck()
-                ))
-                .to(CompletableFutureUtils::fromSingle);
-    }
+  @GET
+  @Consumes(MediaType.WILDCARD)
+  @Produces(MediaType.APPLICATION_JSON)
+  @ApiResponse(content = @Content(schema = @Schema(implementation = HealthCheckResponseDTO.class)))
+  public CompletionStage<HealthCheckResponseDTO> healthcheck() {
+    return HealthCheckResponseDTO.asyncResponseDtoFromMap(ImmutableMap.of(
+            "aerospike", healthCheckDao.aerospikeHealthCheck()
+        ))
+        .to(CompletableFutureUtils::fromSingle);
+  }
 }

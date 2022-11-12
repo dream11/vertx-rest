@@ -9,26 +9,26 @@ import io.reactivex.Completable;
 import lombok.experimental.NonFinal;
 
 public class RestVerticle extends AbstractRestVerticle {
-    @NonFinal
-    private static AerospikeClient aerospikeClient;
+  @NonFinal
+  private static AerospikeClient aerospikeClient;
 
-    public RestVerticle() {
-        super(Constants.TEST_PACKAGE_NAME, AppContext.getContextInstance());
-    }
+  public RestVerticle() {
+    super(Constants.TEST_PACKAGE_NAME, AppContext.getContextInstance());
+  }
 
-    @Override
-    public Completable rxStart() {
-        AerospikeConnectOptions connectOptions = new AerospikeConnectOptions()
-                .setHost(System.getProperty(Constants.AEROSPIKE_HOST))
-                .setPort(Integer.parseInt(System.getProperty(Constants.AEROSPIKE_PORT)));
-        aerospikeClient = AerospikeClient.create(vertx, connectOptions);
-        vertx.getOrCreateContext().put(AerospikeClient.class.getName(), aerospikeClient);
-        return super.rxStart();
-    }
+  @Override
+  public Completable rxStart() {
+    AerospikeConnectOptions connectOptions = new AerospikeConnectOptions()
+        .setHost(System.getProperty(Constants.AEROSPIKE_HOST))
+        .setPort(Integer.parseInt(System.getProperty(Constants.AEROSPIKE_PORT)));
+    aerospikeClient = AerospikeClient.create(vertx, connectOptions);
+    vertx.getOrCreateContext().put(AerospikeClient.class.getName(), aerospikeClient);
+    return super.rxStart();
+  }
 
-    @Override
-    public Completable rxStop() {
-        aerospikeClient.getDelegate().close();
-        return super.rxStop();
-    }
+  @Override
+  public Completable rxStop() {
+    aerospikeClient.getDelegate().close();
+    return super.rxStop();
+  }
 }

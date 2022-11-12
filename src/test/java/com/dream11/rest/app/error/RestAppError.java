@@ -9,9 +9,9 @@ import lombok.ToString;
 @ToString
 @RequiredArgsConstructor
 public enum RestAppError implements RestError {
-    AEROSPIKE_NOT_CONNECTED("AEROSPIKE_NOT_CONNECTED", "Aerospike server is not connected", 503);
+  AEROSPIKE_NOT_CONNECTED("AEROSPIKE_NOT_CONNECTED", "Aerospike server is not connected", 503);
 
-    final String errorCode;
-    final String errorMessage;
-    final int httpStatusCode;
+  final String errorCode;
+  final String errorMessage;
+  final int httpStatusCode;
 }

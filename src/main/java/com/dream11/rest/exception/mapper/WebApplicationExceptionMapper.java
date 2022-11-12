@@ -10,14 +10,14 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class WebApplicationExceptionMapper implements ExceptionMapper<WebApplicationException> {
 
-    public Response toResponse(WebApplicationException webApplicationException) {
-        log.error("Error occurred", webApplicationException);
-        RestException restException =
-                webApplicationException.getCause() instanceof RestException ?
-                        (RestException) webApplicationException.getCause() :
-                        new RestException(RestError.of("UNSUPPORTED_REQUEST",
-                                webApplicationException.getResponse().getStatusInfo().getReasonPhrase(),
-                                webApplicationException.getResponse().getStatus()), webApplicationException);
-        return Response.status(restException.getHttpStatusCode()).entity(restException.toString()).build();
-    }
+  public Response toResponse(WebApplicationException webApplicationException) {
+    log.error("Error occurred", webApplicationException);
+    RestException restException =
+        webApplicationException.getCause() instanceof RestException ?
+            (RestException) webApplicationException.getCause() :
+            new RestException(RestError.of("UNSUPPORTED_REQUEST",
+                webApplicationException.getResponse().getStatusInfo().getReasonPhrase(),
+                webApplicationException.getResponse().getStatus()), webApplicationException);
+    return Response.status(restException.getHttpStatusCode()).entity(restException.toString()).build();
+  }
 }
