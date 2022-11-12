@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <!--  <parent>-->
   <groupId>com.dream11</groupId>
   <artifactId>vertx-rest</artifactId>
   <version>1.0.0-SNAPSHOT</version>
@@ -33,7 +32,7 @@
     <commons-validator.version>1.6</commons-validator.version>
     <resteasy.version>6.2.1.Final</resteasy.version>
     <hibernate-validator.version>8.0.0.Final</hibernate-validator.version>
-    <jakarta.el.version>4.0.0</jakarta.el.version>
+    <jakarta.el.version>4.0.2</jakarta.el.version>
     <swagger-jaxrs2-jakarta.version>2.2.2</swagger-jaxrs2-jakarta.version>
     <reflections.version>0.9.11</reflections.version>
     <guice.version>4.2.2</guice.version>

@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
-import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.startupcheck.MinimumDurationRunningStartupCheckStrategy;
 
@@ -29,8 +28,7 @@ public class Setup implements BeforeAllCallback, AfterAllCallback, ExtensionCont
           .withEnv(Constants.NAMESPACE, Constants.TEST_NAMESPACE)
           .withExposedPorts(3000)
           .withStartupTimeout(Duration.ofSeconds(1000))
-          .withStartupCheckStrategy(new MinimumDurationRunningStartupCheckStrategy(Duration.ofSeconds(10)))
-          .addFileSystemBind(Constants.INIT_DATA_PATH, Constants.INIT_DATA_PATH_IN_CONTAINER, BindMode.READ_ONLY);
+          .withStartupCheckStrategy(new MinimumDurationRunningStartupCheckStrategy(Duration.ofSeconds(10)));
       aerospikeContainer.start();
       System.setProperty(Constants.AEROSPIKE_HOST, aerospikeContainer.getHost());
       System.setProperty(Constants.AEROSPIKE_PORT, String.valueOf(aerospikeContainer.getFirstMappedPort()));

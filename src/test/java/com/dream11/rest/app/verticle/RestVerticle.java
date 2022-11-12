@@ -6,6 +6,7 @@ import com.dream11.rest.app.inject.AppContext;
 import io.d11.aerospike.client.AerospikeConnectOptions;
 import io.d11.reactivex.aerospike.client.AerospikeClient;
 import io.reactivex.Completable;
+import io.vertx.core.http.HttpServerOptions;
 import lombok.experimental.NonFinal;
 
 public class RestVerticle extends AbstractRestVerticle {
@@ -13,7 +14,7 @@ public class RestVerticle extends AbstractRestVerticle {
   private static AerospikeClient aerospikeClient;
 
   public RestVerticle() {
-    super(Constants.TEST_PACKAGE_NAME, AppContext.getContextInstance());
+    super(Constants.TEST_PACKAGE_NAME, new HttpServerOptions().setPort(8080), AppContext.getContextInstance());
   }
 
   @Override

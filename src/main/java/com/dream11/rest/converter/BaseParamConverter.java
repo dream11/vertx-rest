@@ -20,9 +20,8 @@ public class BaseParamConverter {
             .filter(annotation -> annotation.annotationType() == TypeValidationError.class)
             .map(TypeValidationError.class::cast)
             .findAny();
-    optionalAnnotation.ifPresent(typeValidationError -> {
-      this.error = RestError.of(typeValidationError.code(), typeValidationError.message(), typeValidationError.httpStatusCode());
-    });
+    optionalAnnotation.ifPresent(typeValidationError ->
+        this.error = RestError.of(typeValidationError.code(), typeValidationError.message(), typeValidationError.httpStatusCode()));
   }
 
   protected <T> T parseParam(String s, Function<String, T> parseMethod) {

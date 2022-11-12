@@ -1,6 +1,7 @@
 package com.dream11.rest.app.routes;
 
 import com.dream11.rest.annotation.Timeout;
+import com.dream11.rest.app.Constants;
 import com.dream11.rest.app.dto.ValidationTestReqDTO;
 import com.dream11.rest.util.CompletableFutureUtils;
 import io.reactivex.Single;
@@ -24,7 +25,7 @@ import java.util.concurrent.CompletionStage;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Path("/validationTest")
+@Path(Constants.VALIDATION_ROUTE_PATH)
 @Timeout(value = 10000)
 public class ValidationCheckRoute {
   @GET

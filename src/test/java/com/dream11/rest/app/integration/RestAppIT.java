@@ -6,8 +6,8 @@ import com.dream11.rest.app.inject.AppContext;
 import com.dream11.rest.app.module.MainModule;
 import com.dream11.rest.app.verticle.RestVerticle;
 import io.vertx.junit5.VertxExtension;
-import io.vertx.junit5.VertxTestContext;
 import io.vertx.reactivex.core.Vertx;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
@@ -32,22 +32,46 @@ public class RestAppIT {
   @BeforeAll
   public static void setup() {
     AppContext.initialize(Arrays.asList(new MainModule[] {new MainModule(vertx)}));
+    final String verticleName = RestVerticle.class.getName();
+    String verticleId = vertx.rxDeployVerticle(AppContext.getContextInstance().getInstance(RestVerticle.class))
+        .doOnError(error -> log.error("Error in deploying verticle : {}", verticleName, error))
+        .doOnSuccess(v -> log.info("Deployed verticle : {}", verticleName))
+        .blockingGet();
   }
 
   @Test
-  public void healthCheckTest(VertxTestContext testContext) {
-    final String verticleName = RestVerticle.class.getName();
-    vertx.rxDeployVerticle(AppContext.getContextInstance().getInstance(RestVerticle.class))
-        .doOnError(error -> log.error("Error in deploying verticle : {}", verticleName, error))
-        .doOnSuccess(deploymentId -> {
-          log.info("Deployed verticle : {}", verticleName);
-          httpClient = HttpClientBuilder.create().build();
-          HttpResponse response = httpClient.execute(new HttpGet("http://127.0.0.1:80/healthcheck"));
-          MatcherAssert.assertThat(response.getStatusLine().getStatusCode(), Matchers.equalTo(200));
-          MatcherAssert.assertThat(IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8),
-              Matchers.equalTo(Constants.HEALTHCHECK_RESPONSE));
-        })
-        .subscribe(deploymentId -> testContext.completeNow(), testContext::failNow);
+  public void healthCheckTest() throws IOException {
+    String uri = String.format("http://127.0.0.1:%s%s", Constants.APPLICATION_PORT, Constants.HEALTHCHECK_ROUTE_PATH);
+    httpClient = HttpClientBuilder.create().build();
+    HttpResponse response = httpClient.execute(new HttpGet(uri));
+    MatcherAssert.assertThat(response.getStatusLine().getStatusCode(), Matchers.equalTo(200));
+    MatcherAssert.assertThat(IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8),
+        Matchers.equalTo(Constants.HEALTHCHECK_RESPONSE));
   }
 
+  @Test
+  public void nullHeaderTest() throws IOException {
+    String uri = String.format("http://127.0.0.1:%s%s/1?testFilter=query", Constants.APPLICATION_PORT, Constants.VALIDATION_ROUTE_PATH);
+    httpClient = HttpClientBuilder.create().build();
+    HttpResponse response = httpClient.execute(new HttpGet(uri));
+    MatcherAssert.assertThat(response.getStatusLine().getStatusCode(), Matchers.equalTo(400));
+  }
+
+  @Test
+  public void nullQueryParamTest() throws IOException {
+    String uri = String.format("http://127.0.0.1:%s%s/1", Constants.APPLICATION_PORT, Constants.VALIDATION_ROUTE_PATH);
+    httpClient = HttpClientBuilder.create().build();
+    HttpGet request = new HttpGet(uri);
+    request.setHeader("testHeader", "header");
+    HttpResponse response = httpClient.execute(request);
+    MatcherAssert.assertThat(response.getStatusLine().getStatusCode(), Matchers.equalTo(400));
+  }
+
+  @Test
+  public void timeOutTest() throws IOException {
+    String uri = String.format("http://127.0.0.1:%s%s", Constants.APPLICATION_PORT, Constants.TIMEOUT_ROUTE_PATH);
+    httpClient = HttpClientBuilder.create().build();
+    HttpResponse response = httpClient.execute(new HttpGet(uri));
+    MatcherAssert.assertThat(response.getStatusLine().getStatusCode(), Matchers.equalTo(503));
+  }
 }
