@@ -25,14 +25,13 @@
 
   <properties>
     <testcontainers.version>1.17.5</testcontainers.version>
-    <junit-jupiter.version>5.9.1</junit-jupiter.version>
+    <junit-jupiter.version>5.7.0</junit-jupiter.version>
     <junit.version>4.13.2</junit.version>
     <hamcrest.version>2.2</hamcrest.version>
-    <vertx.version>3.9.2</vertx.version>
+    <vertx.version>4.3.4</vertx.version>
     <lombok.version>1.18.12</lombok.version>
     <commons-validator.version>1.6</commons-validator.version>
-    <!-- TODO upgrade to latest versions after resteasy start supporting jakarta validations   -->
-    <resteasy.version>6.1.0.Final</resteasy.version>
+    <resteasy.version>6.2.1.Final</resteasy.version>
     <hibernate-validator.version>8.0.0.Final</hibernate-validator.version>
     <jakarta.el.version>4.0.0</jakarta.el.version>
     <swagger-jaxrs2-jakarta.version>2.2.2</swagger-jaxrs2-jakarta.version>
@@ -51,6 +50,7 @@
     <maven.clean.plugin.version>3.1.0</maven.clean.plugin.version>
     <maven.javadoc.plugin.version>3.2.0</maven.javadoc.plugin.version>
     <maven.surefire.plugin.version>3.0.0-M5</maven.surefire.plugin.version>
+    <maven.failsafe.plugin.version>3.0.0-M5</maven.failsafe.plugin.version>
     <maven.jacoco.plugin.version>0.8.6</maven.jacoco.plugin.version>
     <mave.source.plugin.version>3.2.1</mave.source.plugin.version>
     <maven.gpg.plugin.version>3.0.1</maven.gpg.plugin.version>
@@ -354,6 +354,42 @@
             <goals>
               <goal>report</goal>
             </goals>
+          </execution>
+          <execution>
+            <id>pre-integration-test</id>
+            <phase>pre-integration-test</phase>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>post-integration-test</id>
+            <phase>post-integration-test</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- For Integration Tests-->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <version>${maven.failsafe.plugin.version}</version>
+        <executions>
+          <execution>
+            <id>integration-tests</id>
+            <goals>
+              <goal>integration-test</goal>
+              <goal>verify</goal>
+            </goals>
+            <configuration>
+              <!-- workaround to https://issues.apache.org/jira/browse/SUREFIRE-1831 -->
+              <useModulePath>false</useModulePath>
+              <!-- Ensures root cause ends up in the console -->
+              <trimStackTrace>false</trimStackTrace>
+            </configuration>
           </execution>
         </executions>
       </plugin>

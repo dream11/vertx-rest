@@ -22,7 +22,7 @@ public class Setup implements BeforeAllCallback, AfterAllCallback, ExtensionCont
     }
 
     @Override
-    public void beforeAll(ExtensionContext extensionContext) throws IOException, InterruptedException {
+    public void beforeAll(ExtensionContext extensionContext) {
         if (!started) {
             started = true;
             aerospikeContainer = new GenericContainer<>(AEROSPIKE_IMAGE);

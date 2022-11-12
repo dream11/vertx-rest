@@ -31,23 +31,14 @@ import java.util.Arrays;
 public class RestAppIT {
 
     static HttpClient httpClient;
-    static Vertx vertx;
+    static Vertx vertx = Vertx.vertx();;
 
     @BeforeAll
-    public static void setup(Vertx vertx) {
-        RestAppIT.vertx = vertx;
-        setDefaultRxSchedulers(vertx);
+    public static void setup() {
         AppContext.initialize(Arrays.asList(new MainModule[]{new MainModule(vertx)}));
     }
-
-    private static void setDefaultRxSchedulers(Vertx vertx) {
-        RxJavaPlugins.setComputationSchedulerHandler(s -> RxHelper.scheduler(vertx));
-        RxJavaPlugins.setIoSchedulerHandler(s -> RxHelper.blockingScheduler(vertx));
-        RxJavaPlugins.setNewThreadSchedulerHandler(s -> RxHelper.scheduler(vertx));
-    }
-
     @Test
-    public void healthCheckTest(VertxTestContext testContext) throws IOException {
+    public void healthCheckTest(VertxTestContext testContext) {
         final String verticleName = RestVerticle.class.getName();
         vertx.rxDeployVerticle(AppContext.getContextInstance().getInstance(RestVerticle.class))
                 .doOnError(error -> log.error("Error in deploying verticle : {}", verticleName, error))

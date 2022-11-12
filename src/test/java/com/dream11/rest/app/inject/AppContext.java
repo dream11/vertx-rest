@@ -12,7 +12,7 @@ import java.util.List;
 public class AppContext implements ClassInjector {
     private static volatile AppContext contextInstance = null;
 
-    private Injector injector;
+    private final Injector injector;
 
     private AppContext(List<Module> modules) {
         injector = Guice.createInjector(modules);
