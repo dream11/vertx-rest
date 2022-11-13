@@ -7,7 +7,6 @@ import lombok.ToString;
 import org.apache.http.HttpStatus;
 
 @Getter
-@ToString
 @RequiredArgsConstructor
 public enum RestErrorEnum implements RestError {
 

@@ -54,7 +54,9 @@ public class RestApiIT {
 
   @Test
   public void nullHeaderTest() throws IOException {
-    String uri = String.format("http://127.0.0.1:%s%s/1?testFilter=query", Constants.APPLICATION_PORT, Constants.VALIDATION_ROUTE_PATH);
+    String uri = String.format("http://127.0.0.1:%s%s/1?testFilter=query&doubleParam=1.1&floatParam=1.1&integerParam=1&longParam=1",
+        Constants.APPLICATION_PORT,
+        Constants.VALIDATION_ROUTE_PATH);
     HttpResponse response = httpClient.execute(new HttpGet(uri));
     MatcherAssert.assertThat(response.getStatusLine().getStatusCode(), Matchers.equalTo(400));
   }
@@ -149,4 +151,23 @@ public class RestApiIT {
     MatcherAssert.assertThat(responseBody.getJsonObject("error").getString("message"),
         Matchers.equalTo("resourceId must be integer"));
   }
+
+  @Test
+  public void positiveBodyTest() throws IOException {
+    String uri = String.format("http://127.0.0.1:%s%s", Constants.APPLICATION_PORT, Constants.VALIDATION_ROUTE_PATH);
+    HttpPost request = new HttpPost(uri);
+    request.setHeader("Content-type", "application/json");
+    JsonObject json = new JsonObject().put("resourceId", "1");
+    request.setEntity(new StringEntity(json.toString()));
+    HttpResponse response = httpClient.execute(request);
+    MatcherAssert.assertThat(response.getStatusLine().getStatusCode(), Matchers.equalTo(200));
+  }
+
+  @Test
+  public void routeNotFoundTest() throws IOException {
+    String uri = String.format("http://127.0.0.1:%s%s", Constants.APPLICATION_PORT, "/nonexistent");
+    HttpResponse response = httpClient.execute(new HttpGet(uri));
+    MatcherAssert.assertThat(response.getStatusLine().getStatusCode(), Matchers.equalTo(404));
+  }
+
 }
