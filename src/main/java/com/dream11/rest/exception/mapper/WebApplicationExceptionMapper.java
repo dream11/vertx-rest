@@ -1,6 +1,5 @@
 package com.dream11.rest.exception.mapper;
 
-import com.dream11.rest.exception.RestError;
 import com.dream11.rest.exception.RestException;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Response;
@@ -13,11 +12,10 @@ public class WebApplicationExceptionMapper implements ExceptionMapper<WebApplica
   public Response toResponse(WebApplicationException webApplicationException) {
     log.error("Error occurred", webApplicationException);
     RestException restException =
-        webApplicationException.getCause() instanceof RestException ?
-            (RestException) webApplicationException.getCause() :
-            new RestException(RestError.of("UNSUPPORTED_REQUEST",
+        webApplicationException.getCause() instanceof RestException ? (RestException) webApplicationException.getCause() :
+            new RestException("UNSUPPORTED_REQUEST",
                 webApplicationException.getResponse().getStatusInfo().getReasonPhrase(),
-                webApplicationException.getResponse().getStatus()), webApplicationException);
+                webApplicationException.getResponse().getStatus(), webApplicationException);
     return Response.status(restException.getHttpStatusCode()).entity(restException.toString()).build();
   }
 }

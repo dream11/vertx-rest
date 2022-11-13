@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.dream11</groupId>
   <artifactId>vertx-rest</artifactId>
@@ -23,24 +24,25 @@
   </distributionManagement>
 
   <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
     <testcontainers.version>1.17.5</testcontainers.version>
     <junit-jupiter.version>5.7.0</junit-jupiter.version>
     <junit.version>4.13.2</junit.version>
     <hamcrest.version>2.2</hamcrest.version>
     <vertx.version>4.3.4</vertx.version>
-    <lombok.version>1.18.12</lombok.version>
-    <commons-validator.version>1.6</commons-validator.version>
-    <resteasy.version>6.2.1.Final</resteasy.version>
+    <lombok.version>1.18.24</lombok.version>
+    <commons-validator.version>1.7</commons-validator.version>
+    <resteasy.version>6.2.2.Final</resteasy.version>
     <hibernate-validator.version>8.0.0.Final</hibernate-validator.version>
     <jakarta.el.version>4.0.2</jakarta.el.version>
     <swagger-jaxrs2-jakarta.version>2.2.6</swagger-jaxrs2-jakarta.version>
-    <reflections.version>0.9.11</reflections.version>
-    <guice.version>4.2.2</guice.version>
-    <slf4j.version>2.0.3</slf4j.version>
-    <logback.version>1.4.4</logback.version>
-    <vertx-completable-future.version>0.1.2</vertx-completable-future.version>
-
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <reflections.version>0.10.2</reflections.version>
+    <guice.version>5.1.0</guice.version>
+    <slf4j.version>2.0.5</slf4j.version>
+    <logback.version>1.4.5</logback.version>
+    <commons-io.version>2.11.0</commons-io.version>
+    <checkstyle.version>8.32</checkstyle.version>
 
     <maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
     <maven.compile.version>1.8</maven.compile.version>
@@ -50,11 +52,12 @@
     <maven.javadoc.plugin.version>3.2.0</maven.javadoc.plugin.version>
     <maven.surefire.plugin.version>3.0.0-M5</maven.surefire.plugin.version>
     <maven.failsafe.plugin.version>3.0.0-M5</maven.failsafe.plugin.version>
-    <maven.jacoco.plugin.version>0.8.6</maven.jacoco.plugin.version>
+    <maven.jacoco.plugin.version>0.8.8</maven.jacoco.plugin.version>
     <mave.source.plugin.version>3.2.1</mave.source.plugin.version>
     <maven.gpg.plugin.version>3.0.1</maven.gpg.plugin.version>
     <maven.nexus.plugin.version>1.6.7</maven.nexus.plugin.version>
     <maven.release.plugin.version>3.0.0-M1</maven.release.plugin.version>
+    <maven.checkstyle.plugin.version>3.2.0</maven.checkstyle.plugin.version>
 
     <maven.swagger.plugin.jakarta.version>2.2.6</maven.swagger.plugin.jakarta.version>
     <maven.dependency.plugin.version>3.1.2</maven.dependency.plugin.version>
@@ -81,30 +84,14 @@
 
     <dependency>
       <groupId>io.vertx</groupId>
-      <artifactId>vertx-codegen</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>io.vertx</groupId>
       <artifactId>vertx-web</artifactId>
     </dependency>
 
     <dependency>
       <groupId>io.vertx</groupId>
-      <artifactId>vertx-rx-java2-gen</artifactId>
-      <version>${vertx.version}</version>
+      <artifactId>vertx-rx-java3</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>io.vertx</groupId>
-      <artifactId>vertx-rx-java2</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>me.escoffier.vertx</groupId>
-      <artifactId>vertx-completable-future</artifactId>
-      <version>${vertx-completable-future.version}</version>
-    </dependency>
     <!--  Logging  -->
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -140,7 +127,7 @@
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
-      <version>2.11.0</version>
+      <version>${commons-io.version}</version>
     </dependency>
 
     <!--    RestEasy  -->
@@ -159,12 +146,6 @@
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-jackson2-provider</artifactId>
-      <version>${resteasy.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.jboss.resteasy</groupId>
-      <artifactId>resteasy-rxjava2</artifactId>
       <version>${resteasy.version}</version>
     </dependency>
 
@@ -236,17 +217,6 @@
       <scope>test</scope>
     </dependency>
 
-    <dependency>
-      <groupId>io.d11</groupId>
-      <artifactId>vertx-aerospike-client</artifactId>
-      <version>2.0.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>io.vertx</groupId>
-      <artifactId>vertx-web-client</artifactId>
-    </dependency>
-
   </dependencies>
 
   <dependencyManagement>
@@ -298,8 +268,8 @@
         <version>${maven.compiler.plugin.version}</version>
         <configuration>
           <compilerVersion>${maven.compile.version}</compilerVersion>
-          <source>1.8</source>
-          <target>1.8</target>
+          <source>${maven.compile.source}</source>
+          <target>${maven.compile.target}</target>
           <encoding>${project.build.sourceEncoding}</encoding>
           <useIncrementalCompilation>false</useIncrementalCompilation>
 
@@ -445,17 +415,6 @@
             <package>${swagger.resourcePackage}</package>
           </resourcePackages>
           <prettyPrint>true</prettyPrint>
-          <resourceClasses>
-            <resourceClass>
-              com.dream11.rest.app.routes.HealthCheckRoute
-            </resourceClass>
-            <resourceClass>
-              com.dream11.rest.app.routes.TimeoutRoute
-            </resourceClass>
-            <resourceClass>
-              com.dream11.rest.app.routes.ValidationCheckRoute
-            </resourceClass>
-          </resourceClasses>
         </configuration>
         <executions>
           <execution>
@@ -466,6 +425,24 @@
             </goals>
           </execution>
         </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <version>${maven.checkstyle.plugin.version}</version>
+        <dependencies>
+          <dependency>
+            <groupId>com.puppycrawl.tools</groupId>
+            <artifactId>checkstyle</artifactId>
+            <version>${checkstyle.version}</version>
+          </dependency>
+        </dependencies>
+        <configuration>
+          <consoleOutput>true</consoleOutput>
+          <violationSeverity>warning</violationSeverity>
+          <configLocation>checkstyle.xml</configLocation>
+        </configuration>
       </plugin>
 
     </plugins>

@@ -1,16 +1,11 @@
-package com.dream11.rest.app.integration;
+package com.dream11.rest;
 
-import com.dream11.rest.app.Constants;
-import com.dream11.rest.app.Setup;
-import com.dream11.rest.app.inject.AppContext;
-import com.dream11.rest.app.module.MainModule;
-import com.dream11.rest.app.verticle.RestVerticle;
+import com.dream11.rest.Constants;
+import com.dream11.rest.Setup;
 import io.vertx.core.json.JsonObject;
 import io.vertx.junit5.VertxExtension;
-import io.vertx.reactivex.core.Vertx;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
@@ -21,7 +16,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -32,25 +26,6 @@ import org.junit.jupiter.params.provider.CsvSource;
 class RestApiIT {
 
   private final CloseableHttpClient httpClient = HttpClients.createDefault();
-  private static final Vertx vertx = Vertx.vertx();
-
-  @BeforeAll
-  static void setup() {
-    AppContext.initialize(Arrays.asList(new MainModule[] {new MainModule(vertx)}));
-    final String verticleName = RestVerticle.class.getName();
-    String verticleId = vertx.rxDeployVerticle(AppContext.getContextInstance().getInstance(RestVerticle.class))
-        .doOnError(error -> log.error("Error in deploying verticle : {}", verticleName, error))
-        .doOnSuccess(v -> log.info("Deployed verticle : {}", verticleName)).blockingGet();
-  }
-
-  @Test
-  void healthCheckTest() throws IOException {
-    String uri = String.format("http://127.0.0.1:%s%s", Constants.APPLICATION_PORT, Constants.HEALTHCHECK_ROUTE_PATH);
-    HttpResponse response = httpClient.execute(new HttpGet(uri));
-    MatcherAssert.assertThat(response.getStatusLine().getStatusCode(), Matchers.equalTo(200));
-    MatcherAssert.assertThat(IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8),
-        Matchers.equalTo(Constants.HEALTHCHECK_RESPONSE));
-  }
 
   @Test
   void nullHeaderTest() throws IOException {

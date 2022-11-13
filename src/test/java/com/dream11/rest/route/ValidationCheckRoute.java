@@ -1,11 +1,10 @@
-package com.dream11.rest.app.routes;
+package com.dream11.rest.route;
 
 import com.dream11.rest.annotation.Timeout;
 import com.dream11.rest.annotation.TypeValidationError;
-import com.dream11.rest.app.Constants;
-import com.dream11.rest.app.dto.ValidationTestReqDTO;
-import com.dream11.rest.util.CompletableFutureUtils;
-import io.reactivex.Single;
+import com.dream11.rest.Constants;
+import com.dream11.rest.dto.ValidationTestReqDTO;
+import io.reactivex.rxjava3.core.Single;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -42,7 +41,7 @@ public class ValidationCheckRoute {
                                                    @QueryParam("double") Double testDoubleParam) {
     return Single.just(
             String.format("Validation Successful! testHeader: %s, testResourceId: %s, testFilter: %s", testHeader, testResourceId, testFilter))
-        .to(CompletableFutureUtils::fromSingle);
+        .toCompletionStage();
   }
 
   @POST
@@ -50,6 +49,7 @@ public class ValidationCheckRoute {
   @Produces(MediaType.APPLICATION_JSON)
   @ApiResponse(content = @Content(schema = @Schema(implementation = String.class)))
   public CompletionStage<String> postValidationTest(@Valid ValidationTestReqDTO reqDTO) {
-    return Single.just(String.format("Validation Successful! reqBody: %s", reqDTO.toString())).to(CompletableFutureUtils::fromSingle);
+    return Single.just(String.format("Validation Successful! reqBody: %s", reqDTO.toString()))
+        .toCompletionStage();
   }
 }

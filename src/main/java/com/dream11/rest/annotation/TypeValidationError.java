@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * RestException will following code and message will be thrown upon parsing error
+ * RestException with following code and message will be thrown upon parsing error.
  */
 @Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(value = RetentionPolicy.RUNTIME)

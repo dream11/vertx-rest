@@ -1,7 +1,6 @@
 package com.dream11.rest.provider;
 
 import com.dream11.rest.annotation.TypeValidationError;
-import com.dream11.rest.exception.RestError;
 import com.dream11.rest.exception.RestException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import io.vertx.core.json.jackson.DatabindCodec;
@@ -41,14 +40,14 @@ public class JsonProvider extends ResteasyJackson2Provider {
         if (fieldName != null) {
           TypeValidationError typeValidationError = type.getDeclaredField(fieldName).getAnnotation(TypeValidationError.class);
           if (typeValidationError != null) {
-            throw new RestException(RestError.of(typeValidationError.code(), typeValidationError.message(),
-                typeValidationError.httpStatusCode()), e);
+            throw new RestException(typeValidationError.code(), typeValidationError.message(),
+                typeValidationError.httpStatusCode(), e);
           }
         }
       }
-      throw new RestException(RestError.of("INVALID_REQUEST", e.getMessage(), HttpStatus.SC_BAD_REQUEST), e);
+      throw new RestException("INVALID_REQUEST", e.getMessage(), HttpStatus.SC_BAD_REQUEST, e);
     } catch (IOException e) {
-      throw new RestException(RestError.of("INVALID_REQUEST", e.getMessage(), HttpStatus.SC_BAD_REQUEST), e);
+      throw new RestException("INVALID_REQUEST", e.getMessage(), HttpStatus.SC_BAD_REQUEST, e);
     }
   }
 }

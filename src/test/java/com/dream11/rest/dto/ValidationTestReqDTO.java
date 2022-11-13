@@ -1,4 +1,4 @@
-package com.dream11.rest.app.dto;
+package com.dream11.rest.dto;
 
 import com.dream11.rest.annotation.TypeValidationError;
 import jakarta.validation.constraints.NotNull;

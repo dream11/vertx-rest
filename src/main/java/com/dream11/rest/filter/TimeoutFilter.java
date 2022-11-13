@@ -1,9 +1,8 @@
 package com.dream11.rest.filter;
 
 import com.dream11.rest.annotation.Timeout;
-import com.dream11.rest.exception.RestError;
 import com.dream11.rest.exception.RestException;
-import io.vertx.reactivex.core.Vertx;
+import io.vertx.rxjava3.core.Vertx;
 import jakarta.ws.rs.container.AsyncResponse;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
@@ -29,7 +28,7 @@ public class TimeoutFilter implements ContainerRequestFilter, ContainerResponseF
   private ResourceInfo resourceInfo;
 
   /**
-   * Cancel the vertx timer timer created for timeout
+   * Cancel the vertx timer created for timeout.
    *
    * @param containerRequestContext  requestContext
    * @param containerResponseContext responseContext
@@ -56,12 +55,9 @@ public class TimeoutFilter implements ContainerRequestFilter, ContainerResponseF
     int httpStatusCode;
     if (resourceMethodAnnotation == null) {
       timeout = resourceClassAnnotation == null ? DEFAULT_TIMEOUT : resourceClassAnnotation.value();
-    } else {
-      timeout = resourceMethodAnnotation.value();
-    }
-    if (resourceMethodAnnotation == null) {
       httpStatusCode = resourceClassAnnotation == null ? DEFAULT_HTTP_STATUS_CODE : resourceClassAnnotation.httpStatusCode();
     } else {
+      timeout = resourceMethodAnnotation.value();
       httpStatusCode = resourceMethodAnnotation.httpStatusCode();
     }
     AsyncResponse asyncResponse =
@@ -70,7 +66,7 @@ public class TimeoutFilter implements ContainerRequestFilter, ContainerResponseF
     // not using asyncResponse.setTimeout(timeout) because it creates a vertx timer but do not cancel it upon request completion
     if (timeout > 0 && !asyncResponse.isCancelled() && !asyncResponse.isDone()) {
       long timerId = vertx.setTimer(timeout, id -> asyncResponse.resume(new RestException(
-          RestError.of("REQUEST_TIMEOUT", String.format("Request timed out after %dms", timeout), httpStatusCode))));
+          "REQUEST_TIMEOUT", String.format("Request timed out after %dms", timeout), httpStatusCode)));
       containerRequestContext.setProperty(TIMER_ID, timerId);
     }
   }

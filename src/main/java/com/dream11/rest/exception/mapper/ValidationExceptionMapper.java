@@ -1,8 +1,8 @@
 package com.dream11.rest.exception.mapper;
 
-import com.dream11.rest.exception.RestError;
 import com.dream11.rest.exception.RestException;
 import com.dream11.rest.exception.impl.RestErrorEnum;
+import com.dream11.rest.util.ExceptionUtil;
 import jakarta.validation.ValidationException;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
@@ -13,7 +13,7 @@ public class ValidationExceptionMapper implements ExceptionMapper<ValidationExce
 
   public Response toResponse(ValidationException validationException) {
     log.error("Constraint violation", validationException);
-    RestException restException = new RestException(RestError.of(RestErrorEnum.INVALID_REQUEST), validationException);
+    RestException restException = ExceptionUtil.getException(RestErrorEnum.INVALID_REQUEST, validationException.getMessage());
     return Response.status(Response.Status.BAD_REQUEST).entity(restException.toString()).build();
   }
 }

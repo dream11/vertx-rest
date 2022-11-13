@@ -8,19 +8,17 @@ import com.dream11.rest.filter.RequestResponseFilter;
 import com.dream11.rest.filter.TimeoutFilter;
 import com.dream11.rest.provider.JsonProvider;
 import com.dream11.rest.provider.ParamConverterProvider;
-import com.dream11.rest.route.ClassInjector;
-import com.dream11.rest.util.RestUtil;
-import io.reactivex.Completable;
-import io.reactivex.Single;
-import io.vertx.core.Promise;
+import com.dream11.rest.util.AnnotationUtil;
+import io.reactivex.rxjava3.core.Completable;
+import io.reactivex.rxjava3.core.Single;
 import io.vertx.core.http.HttpServerOptions;
-import io.vertx.reactivex.core.AbstractVerticle;
-import io.vertx.reactivex.core.http.HttpServer;
-import io.vertx.reactivex.core.http.HttpServerRequest;
-import io.vertx.reactivex.ext.web.Router;
-import io.vertx.reactivex.ext.web.handler.BodyHandler;
-import io.vertx.reactivex.ext.web.handler.ResponseContentTypeHandler;
-import io.vertx.reactivex.ext.web.handler.StaticHandler;
+import io.vertx.rxjava3.core.AbstractVerticle;
+import io.vertx.rxjava3.core.http.HttpServer;
+import io.vertx.rxjava3.core.http.HttpServerRequest;
+import io.vertx.rxjava3.ext.web.Router;
+import io.vertx.rxjava3.ext.web.handler.BodyHandler;
+import io.vertx.rxjava3.ext.web.handler.ResponseContentTypeHandler;
+import io.vertx.rxjava3.ext.web.handler.StaticHandler;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.ext.Provider;
 import java.util.ArrayList;
@@ -36,18 +34,18 @@ public abstract class AbstractRestVerticle extends AbstractVerticle {
 
   private final String packageName;
   private final HttpServerOptions httpServerOptions;
-  private final ClassInjector injector;
   private HttpServer httpServer;
 
-  protected AbstractRestVerticle(String packageName, ClassInjector injector) {
-    this(packageName, new HttpServerOptions(), injector);
+  protected AbstractRestVerticle(String packageName) {
+    this(packageName, new HttpServerOptions());
   }
 
-  protected AbstractRestVerticle(String packageName, HttpServerOptions httpServerOptions, ClassInjector injector) {
+  protected AbstractRestVerticle(String packageName, HttpServerOptions httpServerOptions) {
     this.packageName = packageName;
     this.httpServerOptions = httpServerOptions;
-    this.injector = injector;
   }
+
+  protected abstract ClassInjector getInjector();
 
   protected RequestResponseFilter getReqResFilter() {
     return new LoggerFilter();
@@ -59,7 +57,7 @@ public abstract class AbstractRestVerticle extends AbstractVerticle {
   }
 
   private Single<HttpServer> startHttpServer() {
-    VertxResteasyDeployment deployment = this.getResteasyDeployment();
+    VertxResteasyDeployment deployment = this.buildResteasyDeployment();
     Router router = this.getRouter();
     VertxRequestHandler vertxRequestHandler = new VertxRequestHandler(vertx.getDelegate(), deployment);
     val server = vertx.createHttpServer(this.httpServerOptions);
@@ -98,23 +96,24 @@ public abstract class AbstractRestVerticle extends AbstractVerticle {
   }
 
   @Override
-  public void stop(Promise<Void> stopPromise) throws Exception {
+  public Completable rxStop() {
     if (this.httpServer != null) {
-      log.info("stopping http server.");
-      this.httpServer.close();
+      return this.httpServer.rxClose()
+          .doOnComplete(() -> log.info("http server stopped successfully"))
+          .doOnError(err -> log.info("Failed to stop http server", err));
     }
-    super.stop(stopPromise);
+    return Completable.complete();
   }
 
-  protected VertxResteasyDeployment getResteasyDeployment() {
+  protected VertxResteasyDeployment buildResteasyDeployment() {
     VertxResteasyDeployment deployment = new VertxResteasyDeployment();
     deployment.start();
-    List<Class<?>> routes = RestUtil.annotatedClasses(packageName, Path.class);
+    List<Class<?>> routes = AnnotationUtil.getClassesWithAnnotation(packageName, Path.class);
     log.info("JAX-RS routes : " + routes.size());
     ResteasyProviderFactory resteasyProviderFactory = deployment.getProviderFactory();
     this.getProviders().forEach(resteasyProviderFactory::register);
     // not using deployment.getRegistry().addPerInstanceResource because it creates new instance of resource for each request
-    routes.forEach(route -> deployment.getRegistry().addSingletonResource(injector.getInstance(route)));
+    routes.forEach(route -> deployment.getRegistry().addSingletonResource(this.getInjector().getInstance(route)));
     return deployment;
   }
 
@@ -127,7 +126,7 @@ public abstract class AbstractRestVerticle extends AbstractVerticle {
     providers.add(JsonProvider.class);
     providers.add(ParamConverterProvider.class);
     providers.add(this.getReqResFilter().getClass());
-    providers.addAll(RestUtil.annotatedClasses(packageName, Provider.class));
+    providers.addAll(AnnotationUtil.getClassesWithAnnotation(packageName, Provider.class));
     return providers;
   }
 }

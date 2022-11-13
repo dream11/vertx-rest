@@ -1,9 +1,8 @@
-package com.dream11.rest.app.routes;
+package com.dream11.rest.route;
 
 import com.dream11.rest.annotation.Timeout;
-import com.dream11.rest.app.Constants;
-import com.dream11.rest.util.CompletableFutureUtils;
-import io.reactivex.Single;
+import com.dream11.rest.Constants;
+import io.reactivex.rxjava3.core.Single;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -12,9 +11,10 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.TimeUnit;
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Path(Constants.TIMEOUT_ROUTE_PATH)
@@ -29,7 +29,7 @@ public class TimeoutRoute {
   public CompletionStage<String> timeout() {
     return Single.just("1")
         .delay(20, TimeUnit.MILLISECONDS)
-        .to(CompletableFutureUtils::fromSingle);
+        .toCompletionStage();
   }
 
   @GET
@@ -41,6 +41,6 @@ public class TimeoutRoute {
   public CompletionStage<String> timeoutMethod() {
     return Single.just("1")
         .delay(20, TimeUnit.MILLISECONDS)
-        .to(CompletableFutureUtils::fromSingle);
+        .toCompletionStage();
   }
 }

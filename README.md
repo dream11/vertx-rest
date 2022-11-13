@@ -16,7 +16,8 @@
 - [References](#references)
 
 ## Overview
-The vert-rest library aims to make it simple to create a REST application using vertx. A number of Request and Response Filters, Exception Mappers and features like back-pressure, validations, timeout, logging are provided.
+The vert-rest library enables to create a vertx REST application based on JAX-RS annotations. A number of Request and Response Filters, 
+Exception Mappers and features like back-pressure, validations, timeout, logging are provided.
 
 It internally uses [resteasy-vertx](https://github.com/resteasy/resteasy/tree/main/server-adapters/resteasy-vertx)
 ## Usage
@@ -35,7 +36,7 @@ Add the following dependency to the *dependencies* section of your build descrip
 - Gradle (in your `build.gradle` file):
 ```
   dependencies {
-   compile 'com.dream11:vertx-aerospike-client:x.y.z'
+   compile 'com.dream11:vertx-rest:x.y.z'
   }
 ```
 
@@ -47,98 +48,60 @@ Create the Application REST Verticle by extending `com.dream11.rest.AbstractRest
 The `AbstractRestVerticle` here does the following:
 * Finds all the resources(i.e, classes annotated with `@Path`) and adds an instance of each of the resource classes to the resteasy-deployment registry.
 * Adds all the Filters and ExceptionMappers and any other custom Providers(Middle-wares) to the resteasy-deployment.
-* Starts an http-server and dispatches each request to the handler registered with the resteasy-deployment.
+* Starts a http-server and dispatches each request to the handler registered with the resteasy-deployment.
 
 Example:
 
 ```java   
-package com.dream11.rest.app.verticle;
+package com.dream11.rest.verticle;
 
 import com.dream11.rest.AbstractRestVerticle;
-import com.dream11.rest.app.Constants;
-import com.dream11.rest.app.inject.AppContext;
-import io.d11.aerospike.client.AerospikeConnectOptions;
-import io.d11.reactivex.aerospike.client.AerospikeClient;
+import com.dream11.rest.Constants;
+import com.dream11.rest.injector.AppContext;
 import io.reactivex.Completable;
 import lombok.SneakyThrows;
 import lombok.experimental.NonFinal;
 
 public class RestVerticle extends AbstractRestVerticle {
-    @NonFinal
-    private static AerospikeClient aerospikeClient;
     
     public RestVerticle() {
-        super(Constants.TEST_PACKAGE_NAME, AppContext.getContextInstance());
+        super(Constants.TEST_PACKAGE_NAME);
     }
-
+    
     @Override
-    public Completable rxStart() {
-        AerospikeConnectOptions connectOptions = new AerospikeConnectOptions()
-                .setHost(System.getProperty(Constants.AEROSPIKE_HOST))
-                .setPort(Integer.parseInt(System.getProperty(Constants.AEROSPIKE_PORT)));
-        aerospikeClient = AerospikeClient.create(vertx, connectOptions);
-        vertx.getOrCreateContext().put(AerospikeClient.class.getName(), aerospikeClient);
-        return super.rxStart();
-    }
-
-    @Override
-    public Completable rxStop() {
-        aerospikeClient.getDelegate().close();
-        return super.rxStop();
+    protected ClassInjector getInjector() {
+      // Add your implmentation of injector
+      return null;
     }
 }
 ```
 #### Injection
 
-Note that the constructor of  `AbstractRestVerticle` requires an Implementation of the `ClassInjector` interface. This will be used for injecting instances of the REST resource classes, and any other types which may need to be injected.
-Refer to [`com.dream11.rest.app.inject.AppContext`](src/test/java/com/dream11/rest/app/inject/AppContext.java) for an example.
+Implement abstract method `getInjector` of `AbstractRestVerticle` to return an implementation of the `ClassInjector` interface. This will 
+be used for injecting instances of the REST resource classes, and any other types which may need to be injected.
+Refer to [`com.dream11.rest.injector.GuiceInjector`](src/test/java/com/dream11/rest/injector/GuiceInjector.java) for an example.
 
 ### Create a Rest Resource
 
 ```java
-package com.dream11.rest.app.routes;
-
-import com.dream11.rest.annotation.Timeout;
-import com.dream11.rest.app.dao.HealthCheckDao;
-import com.dream11.rest.app.dto.HealthCheckResponseDTO;
-import com.dream11.rest.util.CompletableFutureUtils;
-import com.google.common.collect.ImmutableMap;
-import com.google.inject.Inject;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import lombok.extern.slf4j.Slf4j;
-
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import java.util.concurrent.CompletionStage;
-
-@Slf4j
-@Path("/healthcheck")
-@Timeout(value = 20000, httpStatusCode = 500)
-public class HealthCheckRoute {
-  @Inject
-  HealthCheckDao healthCheckDao;
+@Path("/test")
+public class TestRoute {
 
   @GET
   @Consumes(MediaType.WILDCARD)
   @Produces(MediaType.APPLICATION_JSON)
-  @ApiResponse(content = @Content(schema = @Schema(implementation = HealthCheckResponseDTO.class)))
-  public CompletionStage<HealthCheckResponseDTO> healthcheck() {
-    return HealthCheckResponseDTO.asyncResponseDtoFromMap(ImmutableMap.of(
-                    "aerospike", healthCheckDao.aerospikeHealthCheck()
-            ))
-            .to(CompletableFutureUtils::fromSingle);
+  @ApiResponse(content = @Content(schema = @Schema(implementation = String.class)))
+  public CompletionStage<String> test() {
+    return Single.just("Hello World")
+            .toCompletionStage();
   }
 }
 ```
 Note: 
-* The return type of the resource method(`healthcheck()` in the above example) should ideally be a Java class based on the expected response schema. In case of exceptions, `CompletionStage<Throwable>` can be returned directly. If the exception needs to be handled, handle it using the ExceptionMapper described in the section [Exception Handling](#exception-handling).
+* The return type of the resource method(`test()` in the above example) should ideally be a Java class based on the expected response schema. In case of exceptions, `CompletionStage<Throwable>` can be returned directly. If the exception needs to be handled, handle it using the ExceptionMapper described in the section [Exception Handling](#exception-handling).
 * The `@ApiResponse` is only required for creating swagger specification file.
-(Refer [this](https://github.com/swagger-api/swagger-core/wiki/Annotations) for more annotations)
+* Resteasy context variables can be injected using `@Context` annotations
+* (Refer [this](https://github.com/swagger-api/swagger-core/wiki/Annotations) for more annotations)
 
 #### Validations
 
@@ -166,7 +129,7 @@ Follow [this](docs/swagger/swagger-generation.md) doc to generate swagger specif
 
 #### Example Usage
 
-Please refer to the package `com.dream11.rest.app` inside `src/main/test/java` for an example Application with a simple `/healthcheck` API
+Please refer to the package `com.dream11.rest` inside `src/main/test/java` for an example application
 
 ## References
 

@@ -9,8 +9,8 @@ import org.apache.http.HttpStatus;
 @RequiredArgsConstructor
 public enum RestErrorEnum implements RestError {
 
-  UNKNOWN_EXCEPTION("UNKNOWN_EXCEPTION", "An error has occurred", HttpStatus.SC_INTERNAL_SERVER_ERROR),
-  INVALID_REQUEST("INVALID_REQUEST", "The request violates one or more constraints", HttpStatus.SC_BAD_REQUEST);
+  UNKNOWN_EXCEPTION("UNKNOWN_EXCEPTION", "Something went wrong", HttpStatus.SC_INTERNAL_SERVER_ERROR),
+  INVALID_REQUEST("INVALID_REQUEST", "The request violates one or more constraints: %s", HttpStatus.SC_BAD_REQUEST);
 
   final String errorCode;
   final String errorMessage;

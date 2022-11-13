@@ -1,34 +1,42 @@
 package com.dream11.rest.exception;
 
 import io.vertx.core.json.JsonObject;
+import lombok.Getter;
 
+@Getter
 public class RestException extends RuntimeException {
 
-  private final RestError error;
+  private final String errorMessage;
+  private final String errorCode;
+  private final Integer httpStatusCode;
+
+  public RestException(String errorCode, String errorMessage, Integer httpStatusCode) {
+    this(errorCode, errorMessage, httpStatusCode, null);
+  }
+
+  public RestException(String errorCode, String errorMessage, Integer httpStatusCode, Throwable throwable) {
+    super(errorMessage, throwable);
+    this.errorCode = errorCode;
+    this.errorMessage = errorMessage;
+    this.httpStatusCode = httpStatusCode;
+  }
 
   public RestException(RestError restError) {
-    super(restError.getErrorMessage());
-    this.error = restError;
+    this(restError, null);
   }
 
   public RestException(RestError restError, Throwable cause) {
     super(restError.getErrorMessage(), cause);
-    this.error = restError;
-  }
-
-  public RestError getError() {
-    return error;
-  }
-
-  public int getHttpStatusCode() {
-    return error.getHttpStatusCode();
+    this.errorCode = restError.getErrorCode();
+    this.errorMessage = restError.getErrorMessage();
+    this.httpStatusCode = restError.getHttpStatusCode();
   }
 
   public JsonObject toJson() {
     JsonObject errorJson = new JsonObject()
-        .put("message", this.error.getErrorMessage())
+        .put("message", this.errorMessage)
         .put("cause", this.getCause() == null ? this.getMessage() : this.getCause().getMessage())
-        .put("code", this.error.getErrorCode());
+        .put("code", this.errorCode);
     return new JsonObject()
         .put("error", errorJson);
   }

@@ -1,6 +1,5 @@
-package com.dream11.rest.app.error;
+package com.dream11.rest.exception;
 
-import com.dream11.rest.exception.RestError;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
@@ -9,7 +8,7 @@ import lombok.ToString;
 @ToString
 @RequiredArgsConstructor
 public enum RestAppError implements RestError {
-  AEROSPIKE_NOT_CONNECTED("AEROSPIKE_NOT_CONNECTED", "Aerospike server is not connected", 503);
+  UNKNOWN_EXCEPTION("UNKNOWN_EXCEPTION", "Error:%s, message:%s", 500);
 
   final String errorCode;
   final String errorMessage;
