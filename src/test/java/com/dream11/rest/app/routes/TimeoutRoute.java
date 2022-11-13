@@ -22,10 +22,23 @@ import lombok.extern.slf4j.Slf4j;
 public class TimeoutRoute {
 
   @GET
+  @Path("/class")
   @Consumes(MediaType.WILDCARD)
   @Produces(MediaType.APPLICATION_JSON)
   @ApiResponse(content = @Content(schema = @Schema(implementation = String.class)))
   public CompletionStage<String> timeout() {
+    return Single.just("1")
+        .delay(20, TimeUnit.MILLISECONDS)
+        .to(CompletableFutureUtils::fromSingle);
+  }
+
+  @GET
+  @Path("/method")
+  @Timeout(value = 10, httpStatusCode = 503)
+  @Consumes(MediaType.WILDCARD)
+  @Produces(MediaType.APPLICATION_JSON)
+  @ApiResponse(content = @Content(schema = @Schema(implementation = String.class)))
+  public CompletionStage<String> timeoutMethod() {
     return Single.just("1")
         .delay(20, TimeUnit.MILLISECONDS)
         .to(CompletableFutureUtils::fromSingle);

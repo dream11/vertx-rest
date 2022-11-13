@@ -52,12 +52,18 @@ public class TimeoutFilter implements ContainerRequestFilter, ContainerResponseF
     Timeout resourceMethodAnnotation = resourceInfo.getResourceMethod().getAnnotation(Timeout.class);
     Timeout resourceClassAnnotation = resourceInfo.getResourceClass().getAnnotation(Timeout.class);
     // check timeout annotation on resource method then check on resource class
-    long timeout = resourceMethodAnnotation == null ?
-        resourceClassAnnotation == null ? DEFAULT_TIMEOUT : resourceClassAnnotation.value() :
-        resourceMethodAnnotation.value();
-    int httpStatusCode = resourceMethodAnnotation == null ?
-        resourceClassAnnotation == null ? DEFAULT_HTTP_STATUS_CODE : resourceClassAnnotation.httpStatusCode() :
-        resourceMethodAnnotation.httpStatusCode();
+    long timeout;
+    int httpStatusCode;
+    if (resourceMethodAnnotation == null) {
+      timeout = resourceClassAnnotation == null ? DEFAULT_TIMEOUT : resourceClassAnnotation.value();
+    } else {
+      timeout = resourceMethodAnnotation.value();
+    }
+    if (resourceMethodAnnotation == null) {
+      httpStatusCode = resourceClassAnnotation == null ? DEFAULT_HTTP_STATUS_CODE : resourceClassAnnotation.httpStatusCode();
+    } else {
+      httpStatusCode = resourceMethodAnnotation.httpStatusCode();
+    }
     AsyncResponse asyncResponse =
         ((PostMatchContainerRequestContext) containerRequestContext).getHttpRequest().getAsyncContext().getAsyncResponse();
 

@@ -39,11 +39,11 @@ public abstract class AbstractRestVerticle extends AbstractVerticle {
   private final ClassInjector injector;
   private HttpServer httpServer;
 
-  public AbstractRestVerticle(String packageName, ClassInjector injector) {
+  protected AbstractRestVerticle(String packageName, ClassInjector injector) {
     this(packageName, new HttpServerOptions(), injector);
   }
 
-  public AbstractRestVerticle(String packageName, HttpServerOptions httpServerOptions, ClassInjector injector) {
+  protected AbstractRestVerticle(String packageName, HttpServerOptions httpServerOptions, ClassInjector injector) {
     this.packageName = packageName;
     this.httpServerOptions = httpServerOptions;
     this.injector = injector;
@@ -55,9 +55,7 @@ public abstract class AbstractRestVerticle extends AbstractVerticle {
 
   @Override
   public Completable rxStart() {
-    return this.startHttpServer().doOnSuccess(server -> {
-      this.httpServer = server;
-    }).ignoreElement();
+    return this.startHttpServer().doOnSuccess(server -> this.httpServer = server).ignoreElement();
   }
 
   private Single<HttpServer> startHttpServer() {
@@ -116,9 +114,7 @@ public abstract class AbstractRestVerticle extends AbstractVerticle {
     ResteasyProviderFactory resteasyProviderFactory = deployment.getProviderFactory();
     this.getProviders().forEach(resteasyProviderFactory::register);
     // not using deployment.getRegistry().addPerInstanceResource because it creates new instance of resource for each request
-    routes.forEach(route -> {
-      deployment.getRegistry().addSingletonResource(injector.getInstance(route));
-    });
+    routes.forEach(route -> deployment.getRegistry().addSingletonResource(injector.getInstance(route)));
     return deployment;
   }
 

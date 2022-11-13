@@ -31,14 +31,15 @@ public class ValidationCheckRoute {
   public CompletionStage<String> getValidationTest(@NotNull @HeaderParam("testHeader") Integer testHeader,
                                                    @NotNull @Positive @PathParam("testResourceId") Integer testResourceId,
                                                    @NotBlank @QueryParam("testFilter") String testFilter,
-                                                   @TypeValidationError(code = "BAD_REQUEST", message = "Query param 'intParam' must be integer")
-                                                   @QueryParam("integerParam") Integer testIntParam,
-                                                   @TypeValidationError(code = "BAD_REQUEST", message = "Query param 'longParam' must be long")
-                                                   @QueryParam("longParam") Long testLongParam,
-                                                   @TypeValidationError(code = "BAD_REQUEST", message = "Query param 'floatParam' must be float")
-                                                   @QueryParam("floatParam") Float testFloatParam,
-                                                   @TypeValidationError(code = "BAD_REQUEST", message = "Query param 'doubleParam' must be double")
-                                                   @QueryParam("doubleParam") Double testDoubleParam) {
+                                                   @TypeValidationError(code = "BAD_REQUEST", message = "Query param 'integer' must be "
+                                                       + "integer")
+                                                   @QueryParam("integer") Integer testIntParam,
+                                                   @TypeValidationError(code = "BAD_REQUEST", message = "Query param 'long' must be long")
+                                                   @QueryParam("long") Long testLongParam,
+                                                   @TypeValidationError(code = "BAD_REQUEST", message = "Query param 'float' must be float")
+                                                   @QueryParam("float") Float testFloatParam,
+                                                   @TypeValidationError(code = "BAD_REQUEST", message = "Query param 'double' must be double")
+                                                   @QueryParam("double") Double testDoubleParam) {
     return Single.just(
             String.format("Validation Successful! testHeader: %s, testResourceId: %s, testFilter: %s", testHeader, testResourceId, testFilter))
         .to(CompletableFutureUtils::fromSingle);

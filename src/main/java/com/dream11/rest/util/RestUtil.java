@@ -14,10 +14,12 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.reflections.Reflections;
 
 @Slf4j
+@UtilityClass
 public class RestUtil {
 
   private static final List<Class> collectionClasses = Arrays.asList(

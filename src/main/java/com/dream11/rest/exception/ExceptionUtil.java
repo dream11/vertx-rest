@@ -1,10 +1,10 @@
 package com.dream11.rest.exception;
 
 import com.dream11.rest.exception.impl.RestErrorEnum;
-import lombok.Value;
+import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
+@UtilityClass
 public class ExceptionUtil {
 
   public static Throwable parseThrowable(Throwable throwable) {
