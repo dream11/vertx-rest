@@ -5,24 +5,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.json.jackson.DatabindCodec;
-import java.lang.annotation.Annotation;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.reflections.Reflections;
+import java.lang.annotation.Annotation;
+import java.util.*;
 
 @Slf4j
 @UtilityClass
 public class RestUtil {
 
-  private static final List<Class> collectionClasses = Arrays.asList(
+  private static final List<Class<?>> collectionClasses = Arrays.asList(
       List.class,
       Set.class,
       ArrayList.class,
@@ -57,7 +50,7 @@ public class RestUtil {
     } else if (object instanceof JsonObject) {
       str = String.valueOf(object);
     } else if (collectionClasses.contains(object.getClass())) {
-      str = new JsonArray(new ArrayList((Collection) object)).toString();
+      str = new JsonArray(new ArrayList<>((Collection<?>) object)).toString();
     } else {
       str = objectMapper.writeValueAsString(object);
     }
