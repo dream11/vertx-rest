@@ -10,7 +10,7 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class RestUtil {
 
-  public static String objectToString(Object object) throws JsonProcessingException {
+  public String objectToString(Object object) throws JsonProcessingException {
     ObjectMapper objectMapper = DatabindCodec.mapper();
     String str;
     if (object instanceof String) {

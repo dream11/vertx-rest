@@ -57,8 +57,6 @@ The `AbstractRestVerticle` here does the following:
 * Adds all the `Filters` and `ExceptionMappers` and any other custom `Providers` to the resteasy-deployment
 * Starts a backpressure enabled HTTP server and dispatches each request to the handler registered with the resteasy-deployment
 
-**Example**:
-
 ```java   
 public class RestVerticle extends AbstractRestVerticle {
     
@@ -101,8 +99,8 @@ public class TestRoute {
 ## Exception Handling
 - Provides exceptions and exception mappers to standardize error response
 - Implement `RestError` as an enum to specify error codes, messages and http status codes to be returned in response for your exceptions
-- Throw `RestException` with the restError to return error response in the following format 
-    ```json
+  - Throw `RestException` with the restError to return error response in the following format 
+  ```json
   {
     "error": {
       "code": "UNKNOWN_EXCEPTION",
@@ -131,7 +129,7 @@ public class TestRoute {
 Annotate your provider classes with `@Provider` to automatically register them with resteasy deployment
 
 ## Examples
-Please refer to the package `com.dream11.rest` inside `src/main/test/java` for an example application
+Please refer [tests](src/test/java/com/dream11/rest) for an example application
 
 ## Swagger Specification
 Follow [this](docs/swagger/swagger-generation.md) doc to generate swagger specification.

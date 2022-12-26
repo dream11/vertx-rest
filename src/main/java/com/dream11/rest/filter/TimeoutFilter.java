@@ -20,10 +20,10 @@ import org.jboss.resteasy.core.interception.jaxrs.PostMatchContainerRequestConte
 @Provider
 public class TimeoutFilter implements ContainerRequestFilter, ContainerResponseFilter {
 
-  private static final String TIMER_ID = "__TIMER_ID__";
-  private static final Long DEFAULT_TIMEOUT = 20000L;
-  private static final int DEFAULT_HTTP_STATUS_CODE = HttpStatus.SC_INTERNAL_SERVER_ERROR;
-  private final Vertx vertx = Vertx.currentContext().owner();
+  static final String TIMER_ID = "__TIMER_ID__";
+  static final Long DEFAULT_TIMEOUT = 20000L;
+  static final int DEFAULT_HTTP_STATUS_CODE = HttpStatus.SC_INTERNAL_SERVER_ERROR;
+  final Vertx vertx = Vertx.currentContext().owner();
   @Context
   private ResourceInfo resourceInfo;
 

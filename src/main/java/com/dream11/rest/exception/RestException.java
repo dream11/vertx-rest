@@ -6,9 +6,9 @@ import lombok.Getter;
 @Getter
 public class RestException extends RuntimeException {
 
-  private final String errorMessage;
-  private final String errorCode;
-  private final Integer httpStatusCode;
+  final String errorMessage;
+  final String errorCode;
+  final Integer httpStatusCode;
 
   public RestException(String errorCode, String errorMessage, Integer httpStatusCode) {
     this(errorCode, errorMessage, httpStatusCode, null);

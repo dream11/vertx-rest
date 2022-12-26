@@ -1,15 +1,16 @@
 package com.dream11.rest.util;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.equalTo;
+
 import com.dream11.rest.Constants;
 import com.dream11.rest.route.TimeoutRoute;
 import com.dream11.rest.route.ValidationCheckRoute;
 import jakarta.ws.rs.Path;
-import org.hamcrest.MatcherAssert;
-import org.hamcrest.Matchers;
-import org.junit.jupiter.api.Test;
-
 import java.lang.annotation.Annotation;
 import java.util.List;
+import org.junit.jupiter.api.Test;
 
 class AnnotationUtilTest {
   @Test
@@ -19,8 +20,8 @@ class AnnotationUtilTest {
     // act
     List<Class<?>> classes = AnnotationUtil.getClassesWithAnnotation(Constants.TEST_PACKAGE_NAME, annotation);
     // assert
-    MatcherAssert.assertThat(classes.size(), Matchers.equalTo(2));
-    MatcherAssert.assertThat(classes, Matchers.containsInAnyOrder(ValidationCheckRoute.class, TimeoutRoute.class));
+    assertThat(classes.size(), equalTo(2));
+    assertThat(classes, containsInAnyOrder(ValidationCheckRoute.class, TimeoutRoute.class));
 
   }
 }

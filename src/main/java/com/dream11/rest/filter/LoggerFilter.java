@@ -14,7 +14,7 @@ import org.apache.commons.io.IOUtils;
 @Provider
 public class LoggerFilter extends RequestResponseFilter {
 
-  private static final String REQUEST_START_TIME = "REQUEST_START_TIME";
+  static final String REQUEST_START_TIME = "REQUEST_START_TIME";
 
   @Override
   protected String getResponseString(Object response) throws JsonProcessingException {

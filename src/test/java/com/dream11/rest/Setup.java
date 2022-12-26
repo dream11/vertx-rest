@@ -12,7 +12,7 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 
 @Slf4j
 public class Setup implements BeforeAllCallback, AfterAllCallback, ExtensionContext.Store.CloseableResource {
-  private final Vertx vertx = Vertx.vertx();
+  final Vertx vertx = Vertx.vertx();
 
   @Override
   public void afterAll(ExtensionContext extensionContext) {

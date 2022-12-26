@@ -9,9 +9,9 @@ import java.util.function.Function;
 
 public class BaseParamConverter {
 
-  private String errorMessage;
-  private String errorCode;
-  private Integer httpStatusCode;
+  String errorMessage;
+  String errorCode;
+  Integer httpStatusCode;
 
   public BaseParamConverter(Annotation[] annotations) {
     Optional<TypeValidationError> optionalAnnotation =

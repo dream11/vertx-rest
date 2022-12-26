@@ -8,7 +8,7 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class ExceptionUtil {
 
-  public static Throwable parseThrowable(Throwable throwable) {
+  public Throwable parseThrowable(Throwable throwable) {
     return throwable instanceof RestException ? throwable :
         new RestException(RestErrorEnum.UNKNOWN_EXCEPTION, throwable);
   }

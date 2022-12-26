@@ -29,12 +29,15 @@ import org.jboss.resteasy.plugins.server.vertx.VertxRequestHandler;
 import org.jboss.resteasy.plugins.server.vertx.VertxResteasyDeployment;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
+/**
+ * Starts backpressure enabled HTTP server and registers providers in resteasy deployment.
+ */
 @Slf4j
 public abstract class AbstractRestVerticle extends AbstractVerticle {
 
-  private final String packageName;
-  private final HttpServerOptions httpServerOptions;
-  private HttpServer httpServer;
+  final String packageName;
+  final HttpServerOptions httpServerOptions;
+  HttpServer httpServer;
 
   protected AbstractRestVerticle(String packageName) {
     this(packageName, new HttpServerOptions());
