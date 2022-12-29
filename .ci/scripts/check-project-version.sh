@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
+set -e
 
 PROJECT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-echo "project_version: ${PROJECT_VERSION}"
+echo "PROJECT_VERSION: ${PROJECT_VERSION}"
 if [[ ${PROJECT_VERSION} == *-SNAPSHOT ]]; then
   exit 0
 else
-  echo "Error: project version did not end with '-SNAPSHOT'"
+  echo "Error: project version must be suffixed with '-SNAPSHOT'"
   exit 1
 fi
