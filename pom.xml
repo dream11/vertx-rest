@@ -7,10 +7,32 @@
   <version>1.0.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
+  <name>${project.groupId}:${project.artifactId}</name>
+  <description>Vertx library for writing rest application based on JAX-RS annotations</description>
+  <url>https://github.com/dream11/vertx-rest</url>
+
   <scm>
     <developerConnection>scm:git:https://github.com/dream11/vertx-rest.git</developerConnection>
+    <connection>scm:git:https://github.com/dream11/vertx-rest.git</connection>
+    <url>https://github.com/dream11/vertx-rest</url>
     <tag>HEAD</tag>
   </scm>
+
+  <licenses>
+    <license>
+      <name>MIT License</name>
+      <url>https://github.com/dream11/vertx-rest/raw/master/LICENSE</url>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <name>Akshay Patidar</name>
+      <email>akshay.patidar@dream11.com</email>
+      <organization>Dream11</organization>
+      <organizationUrl>https://www.dream11.com/</organizationUrl>
+    </developer>
+  </developers>
 
   <distributionManagement>
     <snapshotRepository>
