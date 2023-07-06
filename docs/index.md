@@ -61,7 +61,8 @@ The `AbstractRestVerticle` here does the following:
 public class RestVerticle extends AbstractRestVerticle {
     
   public RestVerticle() {
-    super("com.dream11.package");
+    super("com.dream11.package"); // starts http server with default options
+    super("com.dream11.package", new HttpServerOptions().setPort(8080)); // starts http server with provided options
   }
   
   @Override
