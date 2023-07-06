@@ -1,7 +1,7 @@
 # vertx-rest
 [![Continuous Integration](https://github.com/dream11/vertx-rest/actions/workflows/ci.yml/badge.svg)](https://github.com/dream11/vertx-rest/actions/workflows/ci.yml)
 [![Code Coverage](https://codecov.io/gh/dream11/vertx-rest/branch/master/graph/badge.svg)](https://codecov.io/gh/dream11/vertx-rest)
-![License](https://img.shields.io/badge/license-MIT-green.svg)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](https://raw.githubusercontent.com/dream11/vertx-rest/master/LICENSE)
 
 - [Overview](#overview)
 - [Setup](#setup)
