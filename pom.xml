@@ -58,7 +58,7 @@
     <reflections.version>0.10.2</reflections.version>
     <guice.version>5.1.0</guice.version>
     <slf4j.version>2.0.5</slf4j.version>
-    <logback.version>1.4.5</logback.version>
+    <logback.version>1.4.12</logback.version>
     <commons-io.version>2.11.0</commons-io.version>
     <checkstyle.version>8.32</checkstyle.version>
     <junit-jupiter.version>5.7.0</junit-jupiter.version>
