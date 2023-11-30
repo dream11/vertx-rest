@@ -2,8 +2,8 @@ package com.dream11.rest.exception;
 
 import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
+import static org.assertj.core.api.Assertions.assertThat;
+
 
 class RestExceptionTest {
   @Test
@@ -17,13 +17,13 @@ class RestExceptionTest {
     RestException restException = new RestException(restError);
     RestException restExceptionWithCause = new RestException(restError, cause);
     // assert
-    assertThat(restException.getMessage(), equalTo(restError.getErrorMessage()));
-    assertThat(restException.getHttpStatusCode(), equalTo(restError.getHttpStatusCode()));
-    assertThat(restException.getErrorCode(), equalTo(restError.getErrorCode()));
+    assertThat(restException.getMessage()).isEqualTo(restError.getErrorMessage());
+    assertThat(restException.getHttpStatusCode()).isEqualTo(restError.getHttpStatusCode());
+    assertThat(restException.getErrorCode()).isEqualTo(restError.getErrorCode());
 
-    assertThat(restExceptionWithCause.getMessage(), equalTo(restError.getErrorMessage()));
-    assertThat(restExceptionWithCause.getHttpStatusCode(), equalTo(restError.getHttpStatusCode()));
-    assertThat(restExceptionWithCause.getErrorCode(), equalTo(restError.getErrorCode()));
-    assertThat(restExceptionWithCause.getCause(), equalTo(cause));
+    assertThat(restExceptionWithCause.getMessage()).isEqualTo(restError.getErrorMessage());
+    assertThat(restExceptionWithCause.getHttpStatusCode()).isEqualTo(restError.getHttpStatusCode());
+    assertThat(restExceptionWithCause.getErrorCode()).isEqualTo(restError.getErrorCode());
+    assertThat(restExceptionWithCause.getCause()).isEqualTo(cause);
   }
 }

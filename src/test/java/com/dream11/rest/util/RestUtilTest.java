@@ -1,15 +1,12 @@
 package com.dream11.rest.util;
 
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-
 import java.util.Arrays;
 import java.util.List;
-
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
 class RestUtilTest {
@@ -21,7 +18,7 @@ class RestUtilTest {
     // act
     String listToString = RestUtil.objectToString(integerList);
     // assert
-    assertThat(listToString, Matchers.equalTo("[1,2,3]"));
+    assertThat(listToString).isEqualTo("[1,2,3]");
   }
 
   @Test
@@ -29,7 +26,7 @@ class RestUtilTest {
     // arrange
     String message = "MESSAGE";
     // assert
-    assertThat(RestUtil.objectToString(message), Matchers.equalTo(message));
+    assertThat(RestUtil.objectToString(message)).isEqualTo(message);
   }
 
   @Test
@@ -39,8 +36,8 @@ class RestUtilTest {
     // act
     String jsonObjectString = RestUtil.objectToString(jsonObject);
     // assert
-    assertThat(jsonObjectString, Matchers.equalTo(jsonObject.toString()));
-    assertThat(RestUtil.objectToString(jsonObject), Matchers.equalTo(jsonObject.toString()));
+    assertThat(jsonObjectString).isEqualTo(jsonObject.toString());
+    assertThat(RestUtil.objectToString(jsonObject)).isEqualTo(jsonObject.toString());
   }
 
   @Test
@@ -50,6 +47,6 @@ class RestUtilTest {
     // act
     String jsonArrayString = RestUtil.objectToString(jsonArray);
     // assert
-    assertThat(jsonArrayString, Matchers.equalTo(jsonArray.toString()));
+    assertThat(jsonArrayString).isEqualTo(jsonArray.toString());
   }
 }
