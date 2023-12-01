@@ -1,7 +1,7 @@
 package com.dream11.rest.util;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import com.dream11.rest.exception.RestAppError;
 import com.dream11.rest.exception.RestError;
@@ -17,10 +17,10 @@ class ExceptionUtilTest {
     // act
     Throwable throwable = ExceptionUtil.parseThrowable(exception);
     // assert
-    assertThat(throwable.getClass(), equalTo(RestException.class));
-    assertThat(throwable.getMessage(), equalTo(exception.getMessage()));
-    assertThat(((RestException) throwable).getHttpStatusCode(), equalTo(exception.getHttpStatusCode()));
-    assertThat(((RestException) throwable).getErrorCode(), equalTo(exception.getErrorCode()));
+    assertThat(throwable.getClass()).isEqualTo(RestException.class);
+    assertThat(throwable.getMessage()).isEqualTo(exception.getMessage());
+    assertThat(((RestException) throwable).getHttpStatusCode()).isEqualTo(exception.getHttpStatusCode());
+    assertThat(((RestException) throwable).getErrorCode()).isEqualTo(exception.getErrorCode());
   }
 
   @Test
@@ -30,11 +30,11 @@ class ExceptionUtilTest {
     // act
     Throwable throwable = ExceptionUtil.parseThrowable(new RuntimeException(message));
     // assert
-    assertThat(throwable.getClass(), equalTo(RestException.class));
-    assertThat(((RestException) throwable).getHttpStatusCode(), equalTo(RestErrorEnum.UNKNOWN_EXCEPTION.getHttpStatusCode()));
-    assertThat(((RestException) throwable).getErrorCode(), equalTo(RestErrorEnum.UNKNOWN_EXCEPTION.getErrorCode()));
-    assertThat(throwable.getMessage(), equalTo(RestErrorEnum.UNKNOWN_EXCEPTION.getErrorMessage()));
-    assertThat(throwable.getCause().getMessage(), equalTo(message));
+    assertThat(throwable.getClass()).isEqualTo(RestException.class);
+    assertThat(((RestException) throwable).getHttpStatusCode()).isEqualTo(RestErrorEnum.UNKNOWN_EXCEPTION.getHttpStatusCode());
+    assertThat(((RestException) throwable).getErrorCode()).isEqualTo(RestErrorEnum.UNKNOWN_EXCEPTION.getErrorCode());
+    assertThat(throwable.getMessage()).isEqualTo(RestErrorEnum.UNKNOWN_EXCEPTION.getErrorMessage());
+    assertThat(throwable.getCause().getMessage()).isEqualTo(message);
   }
 
   @Test
@@ -47,10 +47,10 @@ class ExceptionUtilTest {
     RestException restException = ExceptionUtil.getException(restError, "Something went wrong", "Error message");
 
     // assert
-    assertThat(restException.getHttpStatusCode(), equalTo(restError.getHttpStatusCode()));
-    assertThat(restException.getErrorCode(), equalTo(restError.getErrorCode()));
-    assertThat(restException.getMessage(), equalTo(errorMessage));
-    assertThat(restException.getMessage(), equalTo(restException.getErrorMessage()));
+    assertThat(restException.getHttpStatusCode()).isEqualTo(restError.getHttpStatusCode());
+    assertThat(restException.getErrorCode()).isEqualTo(restError.getErrorCode());
+    assertThat(restException.getMessage()).isEqualTo(errorMessage);
+    assertThat(restException.getMessage()).isEqualTo(restException.getErrorMessage());
   }
 
 }

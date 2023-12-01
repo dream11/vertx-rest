@@ -13,6 +13,8 @@ import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Single;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.rxjava3.core.AbstractVerticle;
+import io.vertx.rxjava3.core.Context;
+import io.vertx.rxjava3.core.RxHelper;
 import io.vertx.rxjava3.core.http.HttpServer;
 import io.vertx.rxjava3.core.http.HttpServerRequest;
 import io.vertx.rxjava3.ext.web.Router;
@@ -69,8 +71,9 @@ public abstract class AbstractRestVerticle extends AbstractVerticle {
         .map(HttpServerRequest::pause)
         .onBackpressureDrop(req -> {
           log.error("Dropping request with status 503");
-          req.response().setStatusCode(503).end();
+          req.getDelegate().response().setStatusCode(503).end();
         })
+        .observeOn(RxHelper.scheduler(new Context(this.context))) // For backpressure
         .doOnNext(req -> {
           if (req.path().matches("/swagger(.*)")) {
             router.handle(req);

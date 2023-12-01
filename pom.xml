@@ -48,7 +48,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-    <vertx.version>4.3.4</vertx.version>
+    <vertx.version>4.5.0</vertx.version>
     <lombok.version>1.18.24</lombok.version>
     <commons-validator.version>1.7</commons-validator.version>
     <resteasy.version>6.2.2.Final</resteasy.version>
@@ -61,9 +61,11 @@
     <logback.version>1.4.12</logback.version>
     <commons-io.version>2.11.0</commons-io.version>
     <checkstyle.version>8.32</checkstyle.version>
+
+    <!--  Tests  <-->
     <junit-jupiter.version>5.7.0</junit-jupiter.version>
     <junit.version>4.13.2</junit.version>
-    <hamcrest.version>2.2</hamcrest.version>
+    <assertj.version>3.24.2</assertj.version>
 
     <maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
     <maven.compile.version>11</maven.compile.version>
@@ -217,16 +219,23 @@
     </dependency>
 
     <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest</artifactId>
-      <version>${hamcrest.version}</version>
+      <groupId>com.google.inject</groupId>
+      <artifactId>guice</artifactId>
+      <version>${guice.version}</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
-      <groupId>com.google.inject</groupId>
-      <artifactId>guice</artifactId>
-      <version>${guice.version}</version>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <version>${assertj.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-web-client</artifactId>
+      <version>${vertx.version}</version>
       <scope>test</scope>
     </dependency>
 

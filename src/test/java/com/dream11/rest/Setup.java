@@ -4,6 +4,7 @@ import com.dream11.rest.injector.GuiceInjector;
 import com.dream11.rest.util.SharedDataUtil;
 import com.dream11.rest.verticle.RestVerticle;
 import com.google.inject.Guice;
+import io.vertx.core.DeploymentOptions;
 import io.vertx.rxjava3.core.Vertx;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.extension.AfterAllCallback;
@@ -24,7 +25,8 @@ public class Setup implements BeforeAllCallback, AfterAllCallback, ExtensionCont
     GuiceInjector injector = new GuiceInjector(Guice.createInjector());
     SharedDataUtil.setInstance(vertx.getDelegate(), injector);
     final String verticleName = RestVerticle.class.getName();
-    String deploymentId = this.vertx.rxDeployVerticle(injector.getInstance(RestVerticle.class))
+    System.setProperty("rx3.buffer-size", "1"); // Set rxjava buffer size
+    String __ = this.vertx.rxDeployVerticle(injector.getInstance(RestVerticle.class), new DeploymentOptions().setInstances(1))
         .doOnError(error -> log.error("Error in deploying verticle : {}", verticleName, error))
         .doOnSuccess(v -> log.info("Deployed verticle : {}", verticleName)).blockingGet();
   }
