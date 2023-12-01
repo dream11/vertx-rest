@@ -61,8 +61,9 @@ The `AbstractRestVerticle` here does the following:
 public class RestVerticle extends AbstractRestVerticle {
     
   public RestVerticle() {
-    super("com.dream11.package"); // starts http server with default options
-    super("com.dream11.package", new HttpServerOptions().setPort(8080)); // starts http server with provided options
+    // starts http server with default options
+    // All classes with @Path annotation in the specified package are registered with the router
+    super("com.dream11.package"); 
   }
   
   @Override
@@ -70,6 +71,14 @@ public class RestVerticle extends AbstractRestVerticle {
     // Add your implmentation of injector
     return null;
   }
+}
+```
+
+Use the following constructor to pass custom HTTP Server Options
+
+```java
+public RestVerticle() {
+  super("com.dream11.package", new HttpServerOptions().setPort(8080)); // starts http server with provided options
 }
 ```
 

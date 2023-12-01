@@ -48,7 +48,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-    <vertx.version>4.3.4</vertx.version>
+    <vertx.version>4.5.0</vertx.version>
     <lombok.version>1.18.24</lombok.version>
     <commons-validator.version>1.7</commons-validator.version>
     <resteasy.version>6.2.2.Final</resteasy.version>
