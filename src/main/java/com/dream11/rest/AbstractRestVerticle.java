@@ -8,11 +8,12 @@ import com.dream11.rest.filter.RequestResponseFilter;
 import com.dream11.rest.filter.TimeoutFilter;
 import com.dream11.rest.provider.JsonProvider;
 import com.dream11.rest.provider.ParamConverterProvider;
+import com.dream11.rest.provider.impl.JacksonProvider;
 import com.dream11.rest.util.AnnotationUtil;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Single;
 import io.vertx.core.http.HttpServerOptions;
+import io.vertx.core.json.jackson.DatabindCodec;
 import io.vertx.rxjava3.core.AbstractVerticle;
 import io.vertx.rxjava3.core.Context;
 import io.vertx.rxjava3.core.RxHelper;
@@ -26,7 +27,6 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.ext.Provider;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.jboss.resteasy.plugins.server.vertx.VertxRequestHandler;
@@ -58,13 +58,8 @@ public abstract class AbstractRestVerticle extends AbstractVerticle {
     return new LoggerFilter();
   }
 
-  protected ObjectMapper getMapper() {
-    return null;
-  }
-
-  private JsonProvider getJsonProvider() {
-    ObjectMapper mapper = getMapper();
-    return Objects.isNull(mapper) ? new JsonProvider() : new JsonProvider(mapper);
+  protected JsonProvider getJsonProvider() {
+    return new JacksonProvider(DatabindCodec.mapper());
   }
 
   @Override
