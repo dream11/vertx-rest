@@ -127,11 +127,16 @@ public abstract class AbstractRestVerticle extends AbstractVerticle {
     deployment.start();
     List<Class<?>> routes = AnnotationUtil.getClassesWithAnnotation(packageName, Path.class);
     log.info("JAX-RS routes : " + routes.size());
-    ResteasyProviderFactory resteasyProviderFactory = deployment.getProviderFactory();
-    this.getProviders().forEach(resteasyProviderFactory::register);
+    this.registerProviders(deployment.getProviderFactory());
+
     // not using deployment.getRegistry().addPerInstanceResource because it creates new instance of resource for each request
     routes.forEach(route -> deployment.getRegistry().addSingletonResource(this.getInjector().getInstance(route)));
     return deployment;
+  }
+
+  private void registerProviders(ResteasyProviderFactory resteasyProviderFactory) {
+    resteasyProviderFactory.register(this.getJsonProvider());
+    this.getProviders().forEach(resteasyProviderFactory::register);
   }
 
   protected List<Class<?>> getProviders() {
@@ -140,7 +145,6 @@ public abstract class AbstractRestVerticle extends AbstractVerticle {
     providers.add(ValidationExceptionMapper.class);
     providers.add(GenericExceptionMapper.class);
     providers.add(WebApplicationExceptionMapper.class);
-    providers.add(this.getJsonProvider().getClass());
     providers.add(ParamConverterProvider.class);
     providers.add(this.getReqResFilter().getClass());
     providers.addAll(AnnotationUtil.getClassesWithAnnotation(packageName, Provider.class));
