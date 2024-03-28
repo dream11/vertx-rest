@@ -3,6 +3,7 @@ package com.dream11.rest.provider;
 import com.dream11.rest.annotation.TypeValidationError;
 import com.dream11.rest.exception.RestException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.vertx.core.json.jackson.DatabindCodec;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.Produces;
@@ -25,6 +26,10 @@ public class JsonProvider extends ResteasyJackson2Provider {
 
   public JsonProvider() {
     this.setMapper(DatabindCodec.mapper());
+  }
+
+  public JsonProvider(ObjectMapper mapper) {
+    this.setMapper(mapper);
   }
 
   @SneakyThrows
