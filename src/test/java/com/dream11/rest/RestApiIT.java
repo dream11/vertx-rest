@@ -109,6 +109,18 @@ class RestApiIT {
   }
 
   @Test
+  void extraFieldsTest() {
+    // arrange
+    String path = String.format("%s", Constants.VALIDATION_ROUTE_PATH);
+    JsonObject body = new JsonObject().put("resourceId", "1").put("extraKey", "extraValue");
+    // act
+    HttpResponse<Buffer> response = this.makePostRequest(path, body)
+        .blockingGet();
+    // assert
+    assertThat(response.statusCode()).isEqualTo(200);
+  }
+
+  @Test
   void routeNotFoundTest() {
     // arrange
     String path = "/nonexistent";
