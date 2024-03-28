@@ -24,6 +24,6 @@ public class RestVerticle extends AbstractRestVerticle {
 
   @Override
   protected ObjectMapper getMapper() {
-    return DatabindCodec.mapper().disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+    return new ObjectMapper().disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
   }
 }
