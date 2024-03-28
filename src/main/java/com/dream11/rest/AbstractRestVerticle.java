@@ -135,7 +135,7 @@ public abstract class AbstractRestVerticle extends AbstractVerticle {
   }
 
   private void registerProviders(ResteasyProviderFactory resteasyProviderFactory) {
-    resteasyProviderFactory.register(this.getJsonProvider());
+    this.getProviderObjects().forEach(resteasyProviderFactory::register);
     this.getProviders().forEach(resteasyProviderFactory::register);
   }
 
@@ -149,5 +149,11 @@ public abstract class AbstractRestVerticle extends AbstractVerticle {
     providers.add(this.getReqResFilter().getClass());
     providers.addAll(AnnotationUtil.getClassesWithAnnotation(packageName, Provider.class));
     return providers;
+  }
+
+  protected List<Object> getProviderObjects() {
+    List<Object> providerObjects = new ArrayList<>();
+    providerObjects.add(this.getJsonProvider());
+    return providerObjects;
   }
 }
