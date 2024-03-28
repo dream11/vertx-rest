@@ -9,6 +9,7 @@ import com.dream11.rest.filter.TimeoutFilter;
 import com.dream11.rest.provider.JsonProvider;
 import com.dream11.rest.provider.ParamConverterProvider;
 import com.dream11.rest.util.AnnotationUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Single;
 import io.vertx.core.http.HttpServerOptions;
@@ -25,6 +26,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.ext.Provider;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.jboss.resteasy.plugins.server.vertx.VertxRequestHandler;
@@ -54,6 +56,15 @@ public abstract class AbstractRestVerticle extends AbstractVerticle {
 
   protected RequestResponseFilter getReqResFilter() {
     return new LoggerFilter();
+  }
+
+  protected ObjectMapper getMapper() {
+    return null;
+  }
+
+  private JsonProvider getJsonProvider() {
+    ObjectMapper mapper = getMapper();
+    return Objects.isNull(mapper) ? new JsonProvider() : new JsonProvider(mapper);
   }
 
   @Override
@@ -129,7 +140,7 @@ public abstract class AbstractRestVerticle extends AbstractVerticle {
     providers.add(ValidationExceptionMapper.class);
     providers.add(GenericExceptionMapper.class);
     providers.add(WebApplicationExceptionMapper.class);
-    providers.add(JsonProvider.class);
+    providers.add(this.getJsonProvider().getClass());
     providers.add(ParamConverterProvider.class);
     providers.add(this.getReqResFilter().getClass());
     providers.addAll(AnnotationUtil.getClassesWithAnnotation(packageName, Provider.class));
