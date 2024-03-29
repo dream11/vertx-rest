@@ -136,7 +136,35 @@ public class TestRoute {
 - Refer to [`com.dream11.rest.injector.GuiceInjector`](src/test/java/com/dream11/rest/injector/GuiceInjector.java) for an example
 
 ## Custom Providers
-Annotate your provider classes with `@Provider` to automatically register them with resteasy deployment
+- Annotate your provider classes with `@Provider` to automatically register them with resteasy deployment
+
+- Alternatively, if your provider class necessitates a constructor with parameters, you can override the following method in 
+[AbstractRestVerticle](src/main/java/com/dream11/rest/AbstractRestVerticle.java) to register the provider object
+```java
+public class RestVerticle extends AbstractRestVerticle {
+
+  @Override
+  protected List<Object> getProviderObjects() {
+    List<Object> providerObjects = super.getProviderObjects();
+    // add your provider object with custom constructor to the list
+    return providerObjects;
+  }
+}
+```
+
+### Custom Json Provider
+You can create custom json providers by 
+- Implement the `JsonProvider` interface, defined in [JsonProvider](src/main/java/com/dream11/rest/provider/JsonProvider.java) and then,
+- Override the following method in [AbstractRestVerticle](src/main/java/com/dream11/rest/AbstractRestVerticle.java)
+```java
+public class RestVerticle extends AbstractRestVerticle {
+  
+  @Override
+  protected JsonProvider getJsonProvider() {
+    // return your custom json provider
+  }
+}
+```
 
 ## Examples
 Please refer [tests](/src/test/java/com/dream11/rest) for an example application

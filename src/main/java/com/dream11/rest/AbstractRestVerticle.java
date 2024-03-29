@@ -8,10 +8,12 @@ import com.dream11.rest.filter.RequestResponseFilter;
 import com.dream11.rest.filter.TimeoutFilter;
 import com.dream11.rest.provider.JsonProvider;
 import com.dream11.rest.provider.ParamConverterProvider;
+import com.dream11.rest.provider.impl.JacksonProvider;
 import com.dream11.rest.util.AnnotationUtil;
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Single;
 import io.vertx.core.http.HttpServerOptions;
+import io.vertx.core.json.jackson.DatabindCodec;
 import io.vertx.rxjava3.core.AbstractVerticle;
 import io.vertx.rxjava3.core.Context;
 import io.vertx.rxjava3.core.RxHelper;
@@ -54,6 +56,10 @@ public abstract class AbstractRestVerticle extends AbstractVerticle {
 
   protected RequestResponseFilter getReqResFilter() {
     return new LoggerFilter();
+  }
+
+  protected JsonProvider getJsonProvider() {
+    return new JacksonProvider(DatabindCodec.mapper());
   }
 
   @Override
@@ -116,11 +122,16 @@ public abstract class AbstractRestVerticle extends AbstractVerticle {
     deployment.start();
     List<Class<?>> routes = AnnotationUtil.getClassesWithAnnotation(packageName, Path.class);
     log.info("JAX-RS routes : " + routes.size());
-    ResteasyProviderFactory resteasyProviderFactory = deployment.getProviderFactory();
-    this.getProviders().forEach(resteasyProviderFactory::register);
+    this.registerProviders(deployment.getProviderFactory());
+
     // not using deployment.getRegistry().addPerInstanceResource because it creates new instance of resource for each request
     routes.forEach(route -> deployment.getRegistry().addSingletonResource(this.getInjector().getInstance(route)));
     return deployment;
+  }
+
+  private void registerProviders(ResteasyProviderFactory resteasyProviderFactory) {
+    this.getProviderObjects().forEach(resteasyProviderFactory::register);
+    this.getProviders().forEach(resteasyProviderFactory::register);
   }
 
   protected List<Class<?>> getProviders() {
@@ -129,10 +140,15 @@ public abstract class AbstractRestVerticle extends AbstractVerticle {
     providers.add(ValidationExceptionMapper.class);
     providers.add(GenericExceptionMapper.class);
     providers.add(WebApplicationExceptionMapper.class);
-    providers.add(JsonProvider.class);
     providers.add(ParamConverterProvider.class);
     providers.add(this.getReqResFilter().getClass());
     providers.addAll(AnnotationUtil.getClassesWithAnnotation(packageName, Provider.class));
     return providers;
+  }
+
+  protected List<Object> getProviderObjects() {
+    List<Object> providerObjects = new ArrayList<>();
+    providerObjects.add(this.getJsonProvider());
+    return providerObjects;
   }
 }
