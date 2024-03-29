@@ -154,8 +154,8 @@ public class RestVerticle extends AbstractRestVerticle {
 
 ### Custom Json Provider
 You can create custom json providers by 
-- implement the `JsonProvider` interface, defined in [JsonProvider](src/main/java/com/dream11/rest/provider/JsonProvider.java) and then,
-- override the following method in [AbstractRestVerticle](src/main/java/com/dream11/rest/AbstractRestVerticle.java)
+- Implement the `JsonProvider` interface, defined in [JsonProvider](src/main/java/com/dream11/rest/provider/JsonProvider.java) and then,
+- Override the following method in [AbstractRestVerticle](src/main/java/com/dream11/rest/AbstractRestVerticle.java)
 ```java
 public class RestVerticle extends AbstractRestVerticle {
   
