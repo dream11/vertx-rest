@@ -78,6 +78,7 @@
     <maven.jacoco.plugin.version>0.8.8</maven.jacoco.plugin.version>
     <maven.source.plugin.version>3.2.1</maven.source.plugin.version>
     <maven.gpg.plugin.version>3.0.1</maven.gpg.plugin.version>
+    <maven.nexus.plugin.version>1.6.13</maven.nexus.plugin.version>
     <maven.release.plugin.version>3.0.0-M7</maven.release.plugin.version>
     <maven.checkstyle.plugin.version>3.2.0</maven.checkstyle.plugin.version>
 
@@ -398,6 +399,18 @@
             </goals>
           </execution>
         </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>nexus-staging-maven-plugin</artifactId>
+        <version>${maven.nexus.plugin.version}</version>
+        <extensions>true</extensions>
+        <configuration>
+          <serverId>ossrh</serverId>
+          <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
+          <autoReleaseAfterClose>true</autoReleaseAfterClose>
+        </configuration>
       </plugin>
 
       <plugin>
