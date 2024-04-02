@@ -79,11 +79,10 @@
     <maven.source.plugin.version>3.2.1</maven.source.plugin.version>
     <maven.gpg.plugin.version>3.0.1</maven.gpg.plugin.version>
     <maven.nexus.plugin.version>1.6.13</maven.nexus.plugin.version>
-    <maven.release.plugin.version>3.0.0-M7</maven.release.plugin.version>
     <maven.checkstyle.plugin.version>3.2.0</maven.checkstyle.plugin.version>
-
     <maven.swagger.plugin.jakarta.version>2.2.6</maven.swagger.plugin.jakarta.version>
     <maven.dependency.plugin.version>3.1.2</maven.dependency.plugin.version>
+
     <swagger.outputFileName>swagger</swagger.outputFileName>
     <swagger.configurationFilePath>${project.basedir}/src/test/resources/config/swagger/swagger-info.json</swagger.configurationFilePath>
     <swagger.outputPath>target/classes/webroot/swagger</swagger.outputPath>
@@ -410,21 +409,6 @@
           <serverId>ossrh</serverId>
           <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
           <autoReleaseAfterClose>true</autoReleaseAfterClose>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-release-plugin</artifactId>
-        <version>${maven.release.plugin.version}</version>
-        <configuration>
-          <autoVersionSubmodules>true</autoVersionSubmodules>
-          <releaseProfiles>release</releaseProfiles>
-          <tagNameFormat>v@{project.version}</tagNameFormat>
-          <signTag>true</signTag>
-          <scmDevelopmentCommitComment>chore(pom): bump version for next iteration</scmDevelopmentCommitComment>
-          <scmReleaseCommitComment>release(pom): prepare release @{releaseLabel}</scmReleaseCommitComment>
-          <goals>deploy</goals>
         </configuration>
       </plugin>
 
